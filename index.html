@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="en">
+<html class="theme-next mist use-motion" lang="en">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -93,7 +93,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Mist',
     version: '5.1.4',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
@@ -438,7 +438,9 @@
             <h1>Table of Contents<span class="tocSkip"></span></h1>
 <div class="toc"><ul class="toc-item"><li><span><a href="#提升方法（Boosting）" data-toc-modified-id="提升方法（Boosting）-1"><span class="toc-item-num">1&nbsp;&nbsp;</span>提升方法（Boosting）</a></span><ul class="toc-item"></ul></li><li><span><a href="#提升决策树-（BDT，Boosting-Decision-Tree）" data-toc-modified-id="提升决策树-（BDT，Boosting-Decision-Tree）-2"><span class="toc-item-num">2&nbsp;&nbsp;</span>提升决策树 （BDT，Boosting Decision Tree）</a></span><ul class="toc-item"></ul></li><li><span><a href="#梯度提升决策树-（GBDT，Gradient-Boosting-Decision-Tree）" data-toc-modified-id="梯度提升决策树-（GBDT，Gradient-Boosting-Decision-Tree）-3"><span class="toc-item-num">3&nbsp;&nbsp;</span>梯度提升决策树 （GBDT，Gradient Boosting Decision Tree）</a></span><ul class="toc-item"></ul></li><li><span><a href="#极致梯度提升决策树（XGBoost，eXtreme-Gradient-Boosting-Decision-Tree）" data-toc-modified-id="极致梯度提升决策树（XGBoost，eXtreme-Gradient-Boosting-Decision-Tree）-4"><span class="toc-item-num">4&nbsp;&nbsp;</span>极致梯度提升决策树（XGBoost，eXtreme Gradient Boosting Decision Tree）</a></span><ul class="toc-item"></ul></li></ul></div>
 
-<h1 id="XGBoost原理"><a href="#XGBoost原理" class="headerlink" title="XGBoost原理"></a>XGBoost原理</h1><h2 id="1-提升方法（Boosting）"><a href="#1-提升方法（Boosting）" class="headerlink" title="1 提升方法（Boosting）"></a>1 提升方法（Boosting）</h2><p>提升方法使用加法模型和前向分步算法。</p>
+<h1 id="XGBoost原理"><a href="#XGBoost原理" class="headerlink" title="XGBoost原理"></a>XGBoost原理</h1><p>$$<br>\begin{align}<br>XGBoost&amp;=eXtreme+GBDT  \<br>&amp;=eXtreme+(Gradient+BDT)    \<br>&amp;=eXtreme+Gradient+(Boosting+DecisionTree)   \<br>\end{align}<br>$$</p>
+<p>$$<br>Boosting \to BDT \to GBDT \to XGBoost<br>$$</p>
+<h2 id="1-提升方法（Boosting）"><a href="#1-提升方法（Boosting）" class="headerlink" title="1 提升方法（Boosting）"></a>1 提升方法（Boosting）</h2><p>提升方法使用加法模型和前向分步算法。</p>
 <p>加法模型<br>$$<br>f\left(x\right)=\sum_{m=1}^M\beta_m b\left(x;\gamma_m\right)<br>$$<br>其中，$b\left(x;\gamma_m\right)$为基函数，$\gamma_m$为基函数的参数，$\beta_m$为基函数的系数。</p>
 <p>在给定训练数据${\left(x_i,y_i\right)}<em>{i=1}^N$及损失函数$L\left(y,f\left(x\right)\right)$的条件下，学习加法模型$f\left(x\right)$成为经验风险极小化问题：<br>$$<br>\min</em>{\beta_m,\gamma_m}\sum_{i=1}^N L\left(y_i,\sum_{m=1}^M\beta_m b\left(x_i;\gamma_m\right)\right)<br>$$<br>前向分步算法求解这一优化问题的思路：因为学习的是加法模型，可以从前向后，每一步只学习一个基函数及其系数，逐步逼近优化目标函数，则可以简化优化复杂度。具体地，每步只需优化如下损失函数：<br>$$<br>\min_{\beta,\gamma}\sum_{i=1}^N L\left(y_i,\beta b\left(x_i;\gamma\right)\right)<br>$$</p>
 <h3 id="算法1-1-前向分步算法"><a href="#算法1-1-前向分步算法" class="headerlink" title="算法1.1 前向分步算法"></a>算法1.1 前向分步算法</h3><p>输入：训练数据集$T={\left(x_1,y_1\right),\left(x_2,y_2\right),\dots,\left(x_N,y_N\right)}$； 损失函数$L\left(y,f\left(x\right)\right)$；基函数集合${b\left(x;\gamma\right)}$；   </p>
@@ -641,7 +643,7 @@
 
 
 
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
 
 
 

@@ -18,6 +18,18 @@
     </categories>
     
     
+    <tags>
+      
+      <tag>decision_tree</tag>
+      
+      <tag>boosting</tag>
+      
+      <tag>gbdt</tag>
+      
+      <tag>xgboost</tag>
+      
+    </tags>
+    
   </entry>
   
   

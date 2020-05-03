@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>seq2seq_with_attention - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="Seq2Seq-with-Attention"><a href="#Seq2Seq-with-Attention" class="headerlink" title="Seq2Seq with Attention"></a>Seq2Seq with Attention</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-序列到序列任务中的注意力机制"><a href="#1-序列到序列任务中的注意力机制" class="headerlink" title="1 序列到序列任务中的注意力机制"></a>1 序列到序列任务中的注意力机制</h2><h3 id="Seq2Seq-with-Attention网络架构"><a href="#Seq2Seq-with-Attention网络架构" class="headerlink" title="Seq2Seq with Attention网络架构"></a>Seq2Seq with Attention网络架构</h3><p><img src="https://i.loli.net/2020/05/03/tjJTB8Mbq3ngLW2.png" srcset="/img/loading.gif"  align=center  width = "300" height = "400" /></p>
+<p>seq2seq with Attention神经网络架构中，编码器采用双向循环神经网络学习将输入序列$\mathbf{x}$编码成每个时刻的上下文向量（注意力分布）$c_i$，解码器学习将上下文向量$c_i$解码为输出序列$\mathbf{y}$。</p>
+<p>源文本序列：$\mathbf{x}=\left(x_1,\cdots,x_{T_x}\right)$，其中$x_i\in\mathbb{R}^{K_x}$为one-of-K编码 ，$K_x$为源语言词表长度，$T_x$为源语料长度。<br>目标文本序列：$\mathbf{y}=\left(y_1,\cdots,y_{T_y}\right)$，其中$y_i\in\mathbb{R}^{K_y}$为one-of-K编码，$K_y$为目标语言词表长度，$T_y$为目标语料长度。</p>
+<h3 id="Seq2Seq-with-Attention编码器Encoder原理"><a href="#Seq2Seq-with-Attention编码器Encoder原理" class="headerlink" title="Seq2Seq with Attention编码器Encoder原理"></a>Seq2Seq with Attention编码器Encoder原理</h3><p>编码器Encoder采用双向循环神经网络，前向状态计算</p>
+<script type="math/tex; mode=display">\overrightarrow{h}_i=\left\{
+\begin{aligned}
+& \left(1-\overrightarrow{z}_i\right)\circ\overrightarrow{h}_{i-1}+\overrightarrow{z}_i\circ\overrightarrow{\underline{h}}_i& ,\mathbf{i}\mathbf{f}\ i>0\\
+& 0 &, \mathbf{i}\mathbf{f}\ i=0
+\end{aligned}
+\right.</script><p>其中，</p>
+<script type="math/tex; mode=display">\overrightarrow{\underline{h}}_i=\tanh\left(\overrightarrow{W}\overline{E}x_i+\overrightarrow{U}\left[\overrightarrow{r}_i\circ\overrightarrow{h}_{i-1}\right]\right)  \\
+\overrightarrow{z}_i=\sigma\left(\overrightarrow{W}_z\overline{E}x_i+\overrightarrow{U}_z\overrightarrow{h}_{i-1}\right) \\
+\overrightarrow{r}_i=\sigma\left(\overrightarrow{W}_r\overline{E}x_i+\overrightarrow{U}_r\overrightarrow{h}_{i-1}\right)</script><p>$\overline{E}\in\mathbb{R}^{m\times K_x}$为词嵌入矩阵，$m$为词嵌入维度。$\overrightarrow{W},\overrightarrow{W}_z,\overrightarrow{W}_r\in\mathbb{R}^{n\times m}$和$\overrightarrow{U},\overrightarrow{U}_z,\overrightarrow{U}_r\in\mathbb{R}^{n\times n}$为权值矩阵，$n$为隐藏单元数。$\sigma\left(\cdot\right)$通常为sigmoid函数。</p>
+<p>后向状态$\left(\overleftarrow{h}_1,\cdots,\overleftarrow{h}_{T_x}\right)$计算相同。与权值矩阵不同，我们在前向和后向RNN网络中共享词嵌入矩阵$\overline{E}$。</p>
+<p>将前向和后向状态关联起来得到注释$\left(h_1,h_2,\cdots,h_{T_x}\right)$，<br>其中，<script type="math/tex">h_i=\begin{bmatrix}
+\overrightarrow{h}_i\\
+\overleftarrow{h}_i
+\end{bmatrix}</script></p>
+<h3 id="Seq2Seq-with-Attention解码器Decoder原理"><a href="#Seq2Seq-with-Attention解码器Decoder原理" class="headerlink" title="Seq2Seq with Attention解码器Decoder原理"></a>Seq2Seq with Attention解码器Decoder原理</h3><p>解码器Decoder隐层转态$s_i$由解码器注释$h_i$计算的注意力分布$c_i$得到</p>
+<script type="math/tex; mode=display">s_i=\left(1-z_i\right)\circ s_{i-1}+z_i\circ\tilde{s}_i</script><p>其中，</p>
+<script type="math/tex; mode=display">\tilde{s}_i=\tanh\left(WEy_{i-1}+U\left[r_i\circ s_{i-1}\right]+Cc_i\right) \\
+z_i=\sigma\left(W_zEy_{i-1}+U_zs_{i-1}+C_rc_i\right) \\
+r_i=\sigma\left(W_rEy_{i-1}+U_rs_{i-1}+C_rc_i\right)</script><p>$E\in\mathbb{R}^{m\times K_y}$为目标语言的词嵌入矩阵，$m$为词嵌入维度。$W,W_z,W_r\in\mathbb{R}^{n\times m}$和$U,U_z,U_r\in\mathbb{R}^{n\times n}$以及<br>$C,C_z,C_r\in\mathbb{R}^{n\times 2n}$为权值矩阵，$n$为隐藏单元数。隐层初始状态$s_0=\tanh\left(W_s\overleftarrow{h}_1\right)$，其中$W_s\in\mathbb{R}^{n\times n}$。</p>
+<p>每个时刻的上下文向量（注意力分布）$c_i$的计算</p>
+<script type="math/tex; mode=display">c_i=\sum_{j=1}^{T_x}a_{ij}h_j</script><p>其中，</p>
+<script type="math/tex; mode=display">a_{ij}=\frac{\exp\left(e_{ij}\right)}{\sum_{k=1}^{T_x}\exp\left(e_{ik}\right)}    \\ 
+e_{ij}=v_a^\top\tanh\left(W_as_{i-1}+U_ah_j\right)</script><p>$h_j$为源文本序列第$j$个注释。$v_a\in\mathbb{R}^{n^{‘}},W_a\in\mathbb{R}^{n^{‘}\times n},U_a\in\mathbb{R}^{n^{‘}\times 2n}$为权值矩阵。</p>
+<p>使用解码器状态$s_{i-1}$，上下文$c_i$和上时刻生成单词$y_{i-1}$定义目标单词$y_i$的概率</p>
+<script type="math/tex; mode=display">p\left(y_i|s_i,y_{i-1},c_i\right)\propto\exp\left(y_i^\top W_o t_i\right)</script><p>其中，</p>
+<script type="math/tex; mode=display">t_i=\left[\max\left\{\tilde{t}_{i,2j-1},\tilde{t}_{i,wj}\right\}\right]_{j=1,\cdots,l}^\top</script><p>$\tilde{t}_{i,k}$是向量$\tilde{t}_i$的第$k$个元素，</p>
+<script type="math/tex; mode=display">\tilde{t}_i=U_os_{i-1}+V_oEy_{i-1}+C_oc_i</script><p>$W_o\in\mathbb{R}^{K_y\times l},U_o\in\mathbb{R}^{2l\times n},C_o\in\mathbb{R}^{2l\times 2n}$是权值矩阵。</p>
+<h2 id="2-注意力机制"><a href="#2-注意力机制" class="headerlink" title="2 注意力机制"></a>2 注意力机制</h2><h3 id="柔性注意力机制（Soft-Attention）"><a href="#柔性注意力机制（Soft-Attention）" class="headerlink" title="柔性注意力机制（Soft Attention）"></a>柔性注意力机制（Soft Attention）</h3><p>输入信息$X=\left[\mathbf{x}_1,\cdots,\mathbf{x}_N\right]$</p>
+<p>注意力机制的计算：</p>
+<ol>
+<li>在输入信息上计计算注意力分布；</li>
+<li>根据注意力分布计算输入信息的加权平均。</li>
+</ol>
+<h4 id="注意力分布"><a href="#注意力分布" class="headerlink" title="注意力分布"></a>注意力分布</h4><p>给定一个和任务相关的查询向量$\mathbf{q}$，用注意力变量$z\in\left[1,N\right]$表示被选择信息的索引位置，即$z=i$表示选择了第$i$个输入信息。其中，查询向量$\mathbf{q}$可以是动态生成的，也可以是可学习的参数。</p>
+<p>软性注意力的注意力分布<br>在给定输入信息$X$和查询变量$\mathbf{q}$下，选择第$i$个输入信息的概率</p>
+<script type="math/tex; mode=display">\begin{align}
+\alpha_i&=p\left(z=i|X,\mathbf{q}\right) \\
+&=softmax\left(s\left(\mathbf{x}_i,\mathbf{q}\right)\right) \\
+&=\frac{\exp\left(s\left(\mathbf{x}_i,\mathbf{q}\right)\right)}{\sum_{j=1}^N\exp\left(s\left(\mathbf{x}_j,\mathbf{q}\right)\right)}
+\end{align}</script><p>其中，$\alpha_i$称为注意力分布，$s\left(\mathbf{x}_i,\mathbf{q}\right)$称为注意力打分函数。</p>
+<p>注意力打分函数</p>
+<ul>
+<li>加性模型  $s\left(\mathbf{x}_i,\mathbf{q}\right)=\mathbf{v}^\top\tanh\left(W\mathbf{x}_i+U\mathbf{q}\right)$</li>
+<li>点积模型  $s\left(\mathbf{x}_i,\mathbf{q}\right)=\mathbf{x}_i^\top\mathbf{q}$</li>
+<li>缩放点积模型 $s\left(\mathbf{x}_i,\mathbf{q}\right)=\frac{\mathbf{x}_i^\top\mathbf{q}}{\sqrt{d}}$</li>
+<li>双线性模型 $s\left(\mathbf{x}_i,\mathbf{q}\right)=\mathbf{x}_i^\top W\mathbf{q}$  </li>
+</ul>
+<p>其中，$W,U,\mathbf{v}$为可学习的网络参数，$d$为输入信息的维度。<br>加性模型和点积模型的复杂度近似，但点积模型可利用矩阵乘积，计算效率跟高。当输入信息的维度$d$比较高，点积模型值方差较大，导致softmax函数的梯度较小，缩放点积模型可以解决。双线性模型是泛化的点积模型。若假设$W=U^\top V$，则$s\left(\mathbf{x}_i,\mathbf{q}\right)=\mathbf{x}_i^\top U^\top V\mathbf{q}=\left(U\mathbf{x}_i\right)^\top\left(V\mathbf{q}\right)$，即分别对$\mathbf{x}_i$和$\mathbf{q}$进行线性变换后进行点积。相比点积模型，双线性模型在计算相似度是引入了非对称性。</p>
+<p>注意力分布$\alpha_i$可解释为在给定相关查询$\mathbf{q}$时，第$i$个信息受关注的程度。</p>
+<h4 id="加权平均"><a href="#加权平均" class="headerlink" title="加权平均"></a>加权平均</h4><p>注意力函数</p>
+<script type="math/tex; mode=display">\begin{align}
+att\left(X,\mathbf{q}\right)&=\sum_{i=1}^N\alpha_i\mathbf{x}_i  \\
+&=\mathbb{E}_{z\thicksim p\left(z|X,\mathbf{q}\right)}\left[\mathbf{x}\right]
+\end{align}</script><p><img src="https://i.loli.net/2020/05/03/sHoKExjqJeTpgF6.png" srcset="/img/loading.gif"  align=center  width = "300" height = "300" /></p>
+<h3 id="键值对注意力机制（Key-Value-Pair-Attention-Mechanism）"><a href="#键值对注意力机制（Key-Value-Pair-Attention-Mechanism）" class="headerlink" title="键值对注意力机制（Key-Value Pair Attention Mechanism）"></a>键值对注意力机制（Key-Value Pair Attention Mechanism）</h3><p>输入信息$\left(K,V\right)=\left[\left(\mathbf{k}_1,\mathbf{v}_1\right),\cdots,\left(\mathbf{k}_N,\mathbf{v}_N\right)\right]$，其中键用来计算注意力分布$\alpha_i$，值用来计算聚合信息。</p>
+<p>给定任务相关查询向量$\mathbf{q}$时，注意力分布</p>
+<script type="math/tex; mode=display">\alpha_i=\frac{\exp\left(s\left(\mathbf{k}_i,\mathbf{q}\right)\right)}{\sum_{j=1}^N\exp\left(s\left(\mathbf{k}_j,\mathbf{q}\right)\right)}</script><p>注意力函数</p>
+<script type="math/tex; mode=display">\begin{align}
+att\left(\left(K,V\right),\mathbf{q}\right)&=\sum_{i=1}^N\alpha_i\mathbf{v}_i \\
+&=\sum_{i=1}^N\frac{\exp\left(s\left(\mathbf{k}_i,\mathbf{q}\right)\right)}{\sum_{j=1}^N\exp\left(s\left(\mathbf{k}_j,\mathbf{q}\right)\right)}\mathbf{v}_i
+\end{align}</script><p>其中，$s\left(\mathbf{k}_i,\mathbf{q}\right)$为打分函数。当$K=V$时，键值对注意力机制等价为柔性注意力机制。</p>
+<p><img src="https://i.loli.net/2020/05/03/BJSWRXqLU1milEK.png" srcset="/img/loading.gif"  align=center  width = "300" height = "300" /></p>
+<h3 id="多头注意力机制（Multi-Head-Attention-Mechanism）"><a href="#多头注意力机制（Multi-Head-Attention-Mechanism）" class="headerlink" title="多头注意力机制（Multi-Head Attention Mechanism）"></a>多头注意力机制（Multi-Head Attention Mechanism）</h3><p>多个查询$Q=\left[\mathbf{q}_1,\cdots,\mathbf{q}_M\right]$平行的计算从输入信息中选取多个信息。每个注意力关注输入信息的不同部分。</p>
+<script type="math/tex; mode=display">att\left(\left(K,V\right),Q\right)=att\left(\left(K,V\right),\mathbf{q}_1\right)\oplus\cdots\oplus att\left(\left(K,V\right),\mathbf{q}_M\right)</script><p>其中，$\oplus$为向量拼接。</p>
+<h3 id="自注意力模型（Self-Attention-Model）"><a href="#自注意力模型（Self-Attention-Model）" class="headerlink" title="自注意力模型（Self-Attention Model）"></a>自注意力模型（Self-Attention Model）</h3><p>输入序列$X=\left[\mathbf{x}_1,\cdots,\mathbf{x}_N\right]\in\mathbb{R}^{d_1\times N}$<br>输出序列$H=\left[\mathbf{h}_1,\cdots,\mathbf{h}_N\right]\in\mathbb{R}^{d_2\times N}$</p>
+<p>通过线性变换得到向量序列：</p>
+<script type="math/tex; mode=display">Q=W_QX\in\mathbb{R}^{d_3\times N}     \\
+K=W_KX\in\mathbb{R}^{d_3\times N}       \\
+V=W_VX\in\mathbb{R}^{d_2\times N}</script><p>其中，$Q$为查询向量序列，$K$为键向量序列，$V$为值向量序列，$W_Q,W_K,W_V$分别为可学习参数矩阵。</p>
+<p>预测输出向量</p>
+<script type="math/tex; mode=display">\begin{align}
+\hat{\mathbf{h}}_i&=att\left(\left(K,V\right),\mathbf{q}_i\right) \\
+&=\sum_{j=1}^N\alpha_{ij}\mathbf{v}_j \\
+&=\sum_{j=1}^Nsoftmax\left(s\left(\mathbf{k}_j,\mathbf{q}_i\right)\right)\mathbf{v}_j
+\end{align}</script><p>其中，$i,j\in\left[1,N\right]$为输出和输入向量序列的位置，连接权重$\alpha_{ij}$由注意力机制动态生成。</p>
+<p>若使用缩放点积模型作为打分函数，则输出向量序列</p>
+<script type="math/tex; mode=display">\begin{align}
+H_{d_2\times N}&=softmax\left(\frac{K^\top Q}{\sqrt{d_3}}\right)V_{d_2\times N} \\
+&=softmax\left(\frac{K^\top Q}{\sqrt{d_3}}\right)W_VX
+\end{align}</script><p>其中，softmax为按列归一化的函数。</p>
+<p>自注意力模型计算的权重$\alpha_{ij}$只依赖$\mathbf{q}_i$和$\mathbf{k}_j$的相关性，而忽略了输入信息的位置信息。因此自注意力模型一般需要加入位置编码信息来进行修正。</p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/multi-head-attention/">multi-head attention</a>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                      <a class="hover-with-bg" href="/tags/seq2seq/">seq2seq</a>
+                    
+                      <a class="hover-with-bg" href="/tags/attention/">attention</a>
+                    
+                      <a class="hover-with-bg" href="/tags/soft-attention/">soft attention</a>
+                    
+                      <a class="hover-with-bg" href="/tags/key-value-pair-attention/">key-value pair attention</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/03/seq2seq-with-Encoder-Decoder/">
+                        <span class="hidden-mobile">seq2seq_with_Encoder-Decoder</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "seq2seq_with_attention&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>Transformer_Notes - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="Transformer特征提取器"><a href="#Transformer特征提取器" class="headerlink" title="Transformer特征提取器"></a>Transformer特征提取器</h1><script type="math/tex; mode=display">
+\begin{align}    \\     
+\end{align}    \\</script><p><img src="https://i.loli.net/2020/05/03/iQJMDVmbgIyx5F8.png" srcset="/img/loading.gif"  align=center  width = "300" height = "400" /></p>
+<h2 id="1-输入序列、目标序列与输出序列"><a href="#1-输入序列、目标序列与输出序列" class="headerlink" title="1 输入序列、目标序列与输出序列"></a>1 输入序列、目标序列与输出序列</h2><p>输入序列$inputs=\left(i_1,i_2,\cdots,i_p,\cdots,i_N\right)$，其中$i_p\in\mathbb{N}$为输入符号表中的序号。<br>目标序列$targets=\left(t_1,t_2,\cdots,t_q,\cdots,t_M\right)$，其中$t_q\in\mathbb{N}$为目标符号表中的序号。        </p>
+<script type="math/tex; mode=display">outputs\_probabilities=Transformer\left(inputs,targets\right)</script><p>其中，$outputs_probabilities=\left(o_1,o_2,\cdots,o_q,\cdots,o_M\right)$为预测序列，$o_q\in\mathbb{N*}$为目标符号表中的序号。</p>
+<p>在自然语言处理任务中，当输入序列与目标序列中的元素较多，通常以句子为单位划分为若干个对应的“输入-目标”子序列进行学习。</p>
+<h2 id="2-词嵌入与位置编码"><a href="#2-词嵌入与位置编码" class="headerlink" title="2 词嵌入与位置编码"></a>2 词嵌入与位置编码</h2><h3 id="输入序列词嵌入与位置编码"><a href="#输入序列词嵌入与位置编码" class="headerlink" title="输入序列词嵌入与位置编码"></a>输入序列词嵌入与位置编码</h3><p>输入序列词嵌入$Embedding\left(inputs\right)\in\mathbb{R}^{N\times d_{model}}$，其中，$N$为输入序列长度，$d_{model}$为词嵌入维度。</p>
+<p>输入序列位置编码$Pos_Enc\left(inputs_position\right)\in\mathbb{R}^{N\times d_{model}}$，<br>其中，$inputs_position=\left(1,2,\cdots,p,\cdots,N\right)$为输入序列中输入符号对应的位置序号；  </p>
+<script type="math/tex; mode=display">\begin{align}
+Pos\_Enc_{\left(pos,2i\right)}&=\sin\left(pos/10000^{2i/d_{model}}\right)  \\
+Pos\_Enc_{\left(pos,2i+1\right)}&=\cos\left(pos/10000^{2i/d_{model}}\right)
+\end{align}</script><p>其中，$pos\in inputs_position,i\in\left(0,1,\cdots,d_{model}/2\right)$。</p>
+<h3 id="目标序列词嵌入与位置编码"><a href="#目标序列词嵌入与位置编码" class="headerlink" title="目标序列词嵌入与位置编码"></a>目标序列词嵌入与位置编码</h3><p>目标序列词嵌入$Embedding\left(targets\right)\in\mathbb{R}^{M\times d_{model}}$，其中$M$为目标序列长度，$d_{model}$为词嵌入维度。</p>
+<p>目标序列位置编码$Pos_Enc\left(targets_position\right)\in\mathbb{R}^{M\times d_{model}}$，<br>其中，$targets_position=\left(1,2,\cdots,q,\cdots,M\right)$为目标序列的位置序号。</p>
+<h2 id="3-编码器Encoder"><a href="#3-编码器Encoder" class="headerlink" title="3 编码器Encoder"></a>3 编码器Encoder</h2><h3 id="编码器结构"><a href="#编码器结构" class="headerlink" title="编码器结构"></a>编码器结构</h3><p>编码器结构：</p>
+<script type="math/tex; mode=display">\begin{align}
+e_0&=Embedding\left(inputs\right)+Pos\_Enc\left(inputs\_position\right) \\
+e_l&=EncoderLayer\left(e_{l-1}\right),l\in\left[1,n\right] \\
+\end{align}</script><p>其中，$e_0\in\mathbb{R}^{N\times d_{model}}$为编码器输入，$EncoderLayer\left(\cdot\right)$为编码器层，$n$为层数，$e_l\in\mathbb{R}^{N\times d_{model}}$为第$l$层编码器层输出。</p>
+<p>编码器层EncoderLayer：</p>
+<script type="math/tex; mode=display">\begin{align}
+e_{mid}&=LayerNorm\left(e_{in}+MultiHeadAttention\left(e_{in}\right)\right) \\
+e_{out}&=LayerNorm\left(e_{mid}+FFN\left(e_{mid}\right)\right)
+\end{align}</script><p>其中，$e_{in}\in\mathbb{R}^{N\times d_{model}}$为编码器层输入，$e_{out}\in\mathbb{R}^{N\times d_{model}}$为编码器层输出，$MultiHeadAttention\left(\cdot\right)$为多头注意力机制，$FFN\left(\cdot\right)$为前馈神经网络，$LayerNorm\left(\cdot\right)$为层归一化。</p>
+<h3 id="多头注意力机制与缩放点积"><a href="#多头注意力机制与缩放点积" class="headerlink" title="多头注意力机制与缩放点积"></a>多头注意力机制与缩放点积</h3><p><img src="https://i.loli.net/2020/05/03/3iRw2cN7gBqeWls.png" srcset="/img/loading.gif"  align=center tyle="zoom:50%" /></p>
+<p>输入向量序列$e_{in}=\left(e_{in1},e_{in2},\cdots,e_{inN}\right)\in\mathbb{R}^{N\times d_{model}}$，分别得到查询向量序列$Q=e_{in}$，键向量序列$K=e_{in}$，值向量序列$V=e_{in}$。</p>
+<p>多头注意力机制</p>
+<script type="math/tex; mode=display">MultiHeadAttention\left(e_{in}\right)=MultiHead\left(Q,K,V\right)=Concat\left(head_1,\cdots,head_h\right)W^O</script><p>其中，多头输出$head_i=Attention\left(QW_i^Q,KW_i^K,VW_i^V\right)$，可学习的参数矩阵$W_i^Q\in\mathbb{R}^{d_{model}\times d_k},W_i^K\in\mathbb{R}^{d_{model}\times d_k},W_i^V\in\mathbb{R}^{d_{model}\times d_v},W^O\in\mathbb{R}^{hd_v\times d_{model}}$</p>
+<p>使用缩放点积作为打分函数的自注意力机制</p>
+<script type="math/tex; mode=display">Attention\left(QW_i^Q,KW_i^K,VW_i^K\right)=softmax\left(\frac{QW_i^Q\left(KW_i^K\right)^\top}{\sqrt{d_k}}\right)VW_i^V</script><h3 id="编码器pad掩码"><a href="#编码器pad掩码" class="headerlink" title="编码器pad掩码"></a>编码器pad掩码</h3><script type="math/tex; mode=display">enc\_pad\_mask_j=\left(e_{j1},e_{j2},\cdots,e_{jp},\cdots,e_{jN}\right)</script><p>其中，</p>
+<script type="math/tex; mode=display">
+e_{jp}=\left\{
+\begin{array}{rcl}
+True,      &      & {i_p=0}\\
+False,     &      & {i_p \neq 0}
+\end{array} \right.   \quad j=1,2,\cdots,N</script><p>$enc_pad_mask\in\mathbb{R}^{N\times N}$，$i_p$为输入序列$inputs$对应位置序号。</p>
+<h3 id="前馈神经网络"><a href="#前馈神经网络" class="headerlink" title="前馈神经网络"></a>前馈神经网络</h3><script type="math/tex; mode=display">\begin{align}
+FFN\left(e_{mid}\right)&=ReLU\left(e_{mid}W_1+b_1\right)W_2+b_2 \\
+&=\max\left(0,e_{mid}W_1+b_1\right)W_2+b_2
+\end{align}</script><p>其中，参数矩阵$W_1\in\mathbb{R}^{d_{model}\times d_{ff}},W_2\in\mathbb{R}^{d_{ff}\times d_{model}}$，偏置$b_1\in\mathbb{R}^{d_{ff}},b_2\in\mathbb{R}^{d_{model}}$。</p>
+<h2 id="4-解码器Decoder"><a href="#4-解码器Decoder" class="headerlink" title="4 解码器Decoder"></a>4 解码器Decoder</h2><h3 id="解码器结构"><a href="#解码器结构" class="headerlink" title="解码器结构"></a>解码器结构</h3><script type="math/tex; mode=display">\begin{align}
+d_0&=Embedding\left(targets\right)+Pos\_Enc\left(targets\_position\right)  \\
+d_l&=DecoderLayer\left(d_{l-1}\right),l\in\left[1,n\right] \\
+outputs\_probabilities&=softmax\left(d_{n}W\right)
+\end{align}</script><p>其中，$d_0\in\mathbb{R}^{M\times d_{model}}$为解码器输入，$DecoderLayer\left(\cdot\right)$为解码器层，$n$为层数，$d_l\in\mathbb{R}^{M\times d_{model}}$为第$l$层解码器层输出，$W\in\mathbb{R}^{M\times tgt_vocab_size}$输入输出参数矩阵，$softmax\left(\cdot\right)$为softmax层。</p>
+<p>解码器层DecoderLayer：</p>
+<script type="math/tex; mode=display">\begin{align}
+d_{mid1}&=LayerNorm\left(d_{in}+MaskedMultiHeadAttention\left(d_{in}\right)\right) \\
+d_{mid2}&=LayerNorm\left(d_{mid1}+MultiHeadAttention\left(d_{mid1},e_{out}\right)\right) \\
+d_{out}&=LayerNorm\left(d_{mid2}+FFN\left(d_{mid2}\right)\right)
+\end{align}</script><p>其中，$d_{in}\in\mathbb{R}^{M\times d_{model}}$为解码器层输入，$d_{out}\in\mathbb{R}^{M\times d_{model}}$为解码器层输出，$MultiHeadAttention\left(\cdot\right)$为多头注意力机制，$FFN\left(\cdot\right)$为前馈神经网络，$LayerNorm\left(\cdot\right)$为层归一化。</p>
+<h3 id="解码器pad掩码、解码器sequence掩码和编码器解码器pad掩码"><a href="#解码器pad掩码、解码器sequence掩码和编码器解码器pad掩码" class="headerlink" title="解码器pad掩码、解码器sequence掩码和编码器解码器pad掩码"></a>解码器pad掩码、解码器sequence掩码和编码器解码器pad掩码</h3><p>解码器pad掩码</p>
+<script type="math/tex; mode=display">dec\_pad\_mask_j=\left(d_{j1},d_{j2},\cdots,d_{jq},\cdots,d_{jM}\right)</script><p>其中，</p>
+<script type="math/tex; mode=display">
+d_{jq}=\left\{
+\begin{array}{rcl}
+True,      &      & {t_q=0}\\
+False,     &      & {t_q \neq 0}
+\end{array} \right.   \quad j=1,2,\cdots,M</script><p>$dec_pad_mask\in\mathbb{R}^{M\times M}$，$t_q$为目标序列$targets$对应位置序号。</p>
+<p>解码器sequence掩码</p>
+<script type="math/tex; mode=display">dec\_sequence\_mask_j=\left(s_{j1},s_{j2},\cdots,s_{jl},\cdots,s_{jM}\right)</script><p>其中，</p>
+<script type="math/tex; mode=display">
+s_{jl}=\left\{
+\begin{array}{rcl}
+0,      &      & {j\geq l}\\
+1,     &      & {j < l}
+\end{array} \right.   \quad j=1,2,\cdots,M</script><p>$dec_sequence_mask\in\mathbb{R}^{M\times M}$，为非零元素为1的上三角矩阵。</p>
+<p>解码器掩码</p>
+<script type="math/tex; mode=display">dec\_mask=dec\_pad\_mask+dec\_sequence\_mask</script><p>编码器解码器pad掩码</p>
+<script type="math/tex; mode=display">dec\_enc\_pad\_mask_j=\left(de_{j1},de_{j2},\cdots,de_{jp},\cdots,de_{jN}\right)</script><p>其中，</p>
+<script type="math/tex; mode=display">
+de_{jp}=\left\{
+\begin{array}{rcl}
+True,      &      & {i_p=0}\\
+False,     &      & {i_p \neq 0}
+\end{array} \right.   \quad j=1,2,\cdots,M</script><p>$dec_enc_pad_mask\in\mathbb{R}^{M\times N}$，$i_p$为输入序列$inputs$对应位置序号。</p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/encoder-decoder/">encoder-decoder</a>
+                    
+                      <a class="hover-with-bg" href="/tags/self-attention/">self attention</a>
+                    
+                      <a class="hover-with-bg" href="/tags/multi-head-attention/">multi-head attention</a>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/03/seq2seq-with-Encoder-Decoder/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">seq2seq_with_Encoder-Decoder</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/02/XGBoost-Nots/">
+                        <span class="hidden-mobile">XGBoost_Notes</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Transformer_Notes&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

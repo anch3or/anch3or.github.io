@@ -145,34 +145,35 @@
     
     
       <div class="col-12 col-md-4 m-auto">
-        <a href="/2020/05/03/seq2seq-with-attention/" target="_self">
-          <img src="https://i.loli.net/2020/05/03/tjJTB8Mbq3ngLW2.png" srcset="/img/loading.gif" alt="seq2seq_with_attention"
+        <a href="/2020/05/05/Generative-Adversarial-Networks/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/tXHW4NKBMneArUw.png" srcset="/img/loading.gif" alt="Generative_Adversarial_Networks"
                class="index-img img-fluid rounded index-thumbnails">
         </a>
       </div>
     
     <div class="col-12 col-md-8 mx-auto index-info">
-      <a href="/2020/05/03/seq2seq-with-attention/">
-        <p class="h4 index-header">seq2seq_with_attention</p>
+      <a href="/2020/05/05/Generative-Adversarial-Networks/">
+        <p class="h4 index-header">Generative_Adversarial_Networks</p>
       </a>
 
-      <a href="/2020/05/03/seq2seq-with-attention/">
+      <a href="/2020/05/05/Generative-Adversarial-Networks/">
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">Seq2Seq with Attention
+          <div class="index-text mb-1">生成对抗网络（Generative Adversarial Networks）
 \begin{align}
-\end{align}1 序列到序列任务中的注意力机制Seq2Seq with Attention网络架构
-seq2seq with Attention神经网络架构中，编码器采用双向循环神经网络学习将输入序列$\mathbf{x}$编码成每个时刻的上下文向量（注意力分布）$c_i$，解码器学习将上下文向量$c_i$解码为输出序列$\mathbf{y}$。
-源文本序列：$\mathbf{x}=\left(x_1,\cdots,x_{T_x}\right)$，其中$x_i\in\mathbb{R}^{K_x}$为one-of</div>
+\end{align}1. GAN生成对抗网络的原理及实现模型结构及优化
+目标函数：
+
+V\left(D,G\right)=\mathbb{E}_{\mathbf{x}\sim p_{data}\left(\mathbf{x}\right)}\left[\log D\left(\mathbf{x}\right)\right]+\mathbb{E}_{\mathbf{z}\sim p_\mathbf{z}\left(\mathbf{z}\right)}\left[\log\left(1-D</div>
         </div>
       </a>
 
       <div class="index-btm">
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-03&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
@@ -183,17 +184,7 @@ seq2seq with Attention神经网络架构中，编码器采用双向循环神经�
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/multi-head-attention/">multi-head attention</a>&nbsp;
-          
-            <a href="/tags/nlp/">nlp</a>&nbsp;
-          
-            <a href="/tags/seq2seq/">seq2seq</a>&nbsp;
-          
-            <a href="/tags/attention/">attention</a>&nbsp;
-          
-            <a href="/tags/soft-attention/">soft attention</a>&nbsp;
-          
-            <a href="/tags/key-value-pair-attention/">key-value pair attention</a>&nbsp;
+            <a href="/tags/GAN/">GAN</a>&nbsp;
           
         
       </div>
@@ -204,34 +195,33 @@ seq2seq with Attention神经网络架构中，编码器采用双向循环神经�
     
     
       <div class="col-12 col-md-4 m-auto">
-        <a href="/2020/05/03/seq2seq-with-Encoder-Decoder/" target="_self">
-          <img src="https://i.loli.net/2020/05/03/BpqV7omvnr1fLOd.png" srcset="/img/loading.gif" alt="seq2seq_with_Encoder-Decoder"
+        <a href="/2020/05/05/Transfer-Learning/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/29luQad7riv3hwT.png" srcset="/img/loading.gif" alt="Transfer_Learning"
                class="index-img img-fluid rounded index-thumbnails">
         </a>
       </div>
     
     <div class="col-12 col-md-8 mx-auto index-info">
-      <a href="/2020/05/03/seq2seq-with-Encoder-Decoder/">
-        <p class="h4 index-header">seq2seq_with_Encoder-Decoder</p>
+      <a href="/2020/05/05/Transfer-Learning/">
+        <p class="h4 index-header">Transfer_Learning</p>
       </a>
 
-      <a href="/2020/05/03/seq2seq-with-Encoder-Decoder/">
+      <a href="/2020/05/05/Transfer-Learning/">
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">seq2seq with Encoder-Decoder
+          <div class="index-text mb-1">迁移学习（Transfer Learning）
 \begin{align}
-\end{align}1 RNN Encoder-Decoder神经网络架构
-RNN Encoder-Decoder神经网络架构使用循环神经网络学习将变长源序列$X$编码成定长向量表示$\mathbf{c}$，并将学习的定长向量表示$\mathbf{c}$解码成变长目标序列$Y$。模型的编码器和解码器被联合训练，以最大化给定源序列的目标序列的条件概率。
-源文本序列：$X=\left(\mathbf{x}_{1}, \mathbf{x}_{2}, \dots, \mathbf{x}_{N}\right)$其中，</div>
+\end{align}1 迁移学习的形式化定义领域$\mathcal{D}$：数据及数据的概率分布源领域$\mathcal{D}_s=\{\left(\mathbf{x}_i,y_i\right)|P_s\left(\mathbf{x}_i\right)\}_{i=1}^n$目标领域$\mathcal{D}_t=\{\mathbf{x}_j|P_t\left(\mathbf{x}_j\right)\}_{j=n+1}^{n+m}$
+迁移学习（Transfer Learning）：给定有标记源领域$\mathcal{D}</div>
         </div>
       </a>
 
       <div class="index-btm">
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-03&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
@@ -242,11 +232,9 @@ RNN Encoder-Decoder神经网络架构使用循环神经网络学习将变长源�
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/encoder-decoder/">encoder-decoder</a>&nbsp;
+            <a href="/tags/domain-adaptation/">domain adaptation</a>&nbsp;
           
-            <a href="/tags/nlp/">nlp</a>&nbsp;
-          
-            <a href="/tags/seq2seq/">seq2seq</a>&nbsp;
+            <a href="/tags/finetune/">finetune</a>&nbsp;
           
         
       </div>
@@ -257,34 +245,34 @@ RNN Encoder-Decoder神经网络架构使用循环神经网络学习将变长源�
     
     
       <div class="col-12 col-md-4 m-auto">
-        <a href="/2020/05/03/Transformer-Notes/" target="_self">
-          <img src="https://i.loli.net/2020/05/03/iQJMDVmbgIyx5F8.png" srcset="/img/loading.gif" alt="Transformer_Notes"
+        <a href="/2020/05/05/Nerual-Probabilistic-Language-Model/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/Zud3VClSxYbsK49.png" srcset="/img/loading.gif" alt="Nerual_Probabilistic_Language_Model"
                class="index-img img-fluid rounded index-thumbnails">
         </a>
       </div>
     
     <div class="col-12 col-md-8 mx-auto index-info">
-      <a href="/2020/05/03/Transformer-Notes/">
-        <p class="h4 index-header">Transformer_Notes</p>
+      <a href="/2020/05/05/Nerual-Probabilistic-Language-Model/">
+        <p class="h4 index-header">Nerual_Probabilistic_Language_Model</p>
       </a>
 
-      <a href="/2020/05/03/Transformer-Notes/">
+      <a href="/2020/05/05/Nerual-Probabilistic-Language-Model/">
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">Transformer特征提取器
-\begin{align}    \\     
-\end{align}    \\
-1 输入序列、目标序列与输出序列输入序列$inputs=\left(i_1,i_2,\cdots,i_p,\cdots,i_N\right)$，其中$i_p\in\mathbb{N}$为输入符号表中的序号。目标序列$targets=\left(t_1,t_2,\cdots,t_q,\cdots,t_M\right)$，其中$t_q\in\mathbb{N}$为目标符号表中的序号。        
-outputs\_probabilities=Transformer\left(</div>
+          <div class="index-text mb-1">A Neural Probabilistic Language Model
+\begin{align}
+\end{align}1 统计语言模型与n-gram模型统计语言模型可描述为给定前序词序列后，下一单词出现的条件概率的乘积：
+\hat P\left(w_1^T\right)=\prod_{t=1}^T\hat P\left(w_t|w_1^{t-1}\right)其中，$w_t$是第$t$个单词，$w_i^j=\left(w_i,w_{i+1},\dots,w_{j-1},w_j\right)$是从第$i$个单词到第$j$个单词的子序列。
+n-gram模型可描述为给定前$n-1$个单词后，</div>
         </div>
       </a>
 
       <div class="index-btm">
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-03&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
@@ -295,13 +283,9 @@ outputs\_probabilities=Transformer\left(</div>
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/encoder-decoder/">encoder-decoder</a>&nbsp;
-          
-            <a href="/tags/self-attention/">self attention</a>&nbsp;
-          
-            <a href="/tags/multi-head-attention/">multi-head attention</a>&nbsp;
-          
             <a href="/tags/nlp/">nlp</a>&nbsp;
+          
+            <a href="/tags/language-model/">language model</a>&nbsp;
           
         
       </div>
@@ -312,39 +296,177 @@ outputs\_probabilities=Transformer\left(</div>
     
     
       <div class="col-12 col-md-4 m-auto">
-        <a href="/2020/05/02/XGBoost-Nots/" target="_self">
-          <img src="https://i.loli.net/2020/05/03/qJOMyGjDuCzpcR1.png" srcset="/img/loading.gif" alt="XGBoost_Notes"
+        <a href="/2020/05/05/Feedforward-Nerual-Network/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/Y7H5bvGjiQrwIFP.png" srcset="/img/loading.gif" alt="Feedforward_Nerual_Network"
                class="index-img img-fluid rounded index-thumbnails">
         </a>
       </div>
     
     <div class="col-12 col-md-8 mx-auto index-info">
-      <a href="/2020/05/02/XGBoost-Nots/">
-        <p class="h4 index-header">XGBoost_Notes</p>
+      <a href="/2020/05/05/Feedforward-Nerual-Network/">
+        <p class="h4 index-header">Feedforward_Nerual_Network</p>
       </a>
 
-      <a href="/2020/05/02/XGBoost-Nots/">
+      <a href="/2020/05/05/Feedforward-Nerual-Network/">
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">XGBoost原理
-\begin{align}    \\ 
-XGBoost&=eXtreme+GBDT  \\    
-&=eXtreme+(Gradient+BDT)    \\    
-&=eXtreme+Gradient+(Boosting+DecisionTree)   \\    
-\end{align}    \\
-Boosting \to BDT \to GBDT \to XGBoost1 提升方法（Boosting）提升方法使用加法模型和前向分步算法。
-加法模型
-
-f\left(x\right)=\sum_{m=1}^M\beta_m b\left(x;\gamma_m\ri</div>
+          <div class="index-text mb-1">前馈神经网络（Feedforward Neural Network，FNN）
+\begin{align}
+\end{align}1 前馈神经网络结构及前向传播训练数据集\begin{align} \\&amp; T = \left\{ \left( \mathbf{x}_{1}, y_{1} \right), \left( \mathbf{x}_{2}, y_{2} \right), \cdots, \left(\mathbf{x}_i,y_i\right),\cdots,\left( \mathbf{x}_{N}, y_{N} \right) \right\} \end{align}其中，$</div>
         </div>
       </a>
 
       <div class="index-btm">
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-02&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Deep-Learning/">Deep Learning</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nerual-network/">nerual network</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto">
+        <a href="/2020/05/05/Recurrent-Nerual-Network/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/l2Q9vT3UkqAnPFj.png" srcset="/img/loading.gif" alt="Recurrent_Nerual_Network"
+               class="index-img img-fluid rounded index-thumbnails">
+        </a>
+      </div>
+    
+    <div class="col-12 col-md-8 mx-auto index-info">
+      <a href="/2020/05/05/Recurrent-Nerual-Network/">
+        <p class="h4 index-header">Recurrent_Nerual_Network</p>
+      </a>
+
+      <a href="/2020/05/05/Recurrent-Nerual-Network/">
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">循环神经网络（Recurrent Neural Network，RNN）
+\begin{align}
+\end{align}1 循环神经网络结构数据集  
+\big\{\left(\mathbf{x}_t,\mathbf{y}_t\right)\big\}_{t=1}^T其中，第$t$时刻输入数据$\mathbf{x}_t=\left(x_t^{\left(1\right)},x_t^{\left(2\right)},\dots,x_t^{\left(n\right)}\right)^{\top}\in\mathbb{R}^n,$第$t$时刻输出数据$\mathbf{y}_t=\left(y_</div>
+        </div>
+      </a>
+
+      <div class="index-btm">
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Deep-Learning/">Deep Learning</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nerual-network/">nerual network</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto">
+        <a href="/2020/05/05/Convolutional-Nerual-Network/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/N6YXO7hZrJ9pltI.png" srcset="/img/loading.gif" alt="Convolutional_Nerual_Network"
+               class="index-img img-fluid rounded index-thumbnails">
+        </a>
+      </div>
+    
+    <div class="col-12 col-md-8 mx-auto index-info">
+      <a href="/2020/05/05/Convolutional-Nerual-Network/">
+        <p class="h4 index-header">Convolutional_Nerual_Network</p>
+      </a>
+
+      <a href="/2020/05/05/Convolutional-Nerual-Network/">
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">卷积神经网络（Convolutional Neural Network，CNN）
+\begin{align}
+\end{align}卷积神经网络一般由卷积层、汇聚层和全连接层交叉堆叠而成的前馈神经网络，使用误差反向传播算法进行训练。
+1 卷积基础一维卷积：信号发生器每个时刻$t$产生一个信号$x_t$，生成信号序列$\left(x_1,x_2,\cdots,x_t,\cdots\right)$。其信息衰减率为$w_k$，即在$k-1$个时间步长后信息为原来的$w_k$倍，将$\left(w_1,w_2,\cdots,w_k,\cdots\right)$称为滤波器或卷积核。
+设滤波器序列为$\l</div>
+        </div>
+      </a>
+
+      <div class="index-btm">
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Deep-Learning/">Deep Learning</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nerual-network/">nerual network</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto">
+        <a href="/2020/05/05/CRF/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/Y7H5bvGjiQrwIFP.png" srcset="/img/loading.gif" alt="CRF"
+               class="index-img img-fluid rounded index-thumbnails">
+        </a>
+      </div>
+    
+    <div class="col-12 col-md-8 mx-auto index-info">
+      <a href="/2020/05/05/CRF/">
+        <p class="h4 index-header">CRF</p>
+      </a>
+
+      <a href="/2020/05/05/CRF/">
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">条件随机场（Conditional Random Field，CRF）
+\begin{align}
+\end{align}图是由结点及连接结点的编组成的集合。结点记作$v$，结点集合记作$V$；边记作$e$，边的集合记作$E$；图记作$G=\left(V,E\right)$。
+概率图模型是由图表示的概率分布。设由联合分布$P\left(Y\right)$，$Y \in \mathcal{Y}$是一组随机变量。由无向图$G=\left(V,E\right)$表示概率分布$P\left(Y\right)$，即在图$G$中，结点$v \in V$表示一个随机变量$Y_{v}$，$Y=\left(Y_</div>
+        </div>
+      </a>
+
+      <div class="index-btm">
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
@@ -355,13 +477,169 @@ f\left(x\right)=\sum_{m=1}^M\beta_m b\left(x;\gamma_m\ri</div>
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/decision-tree/">decision tree</a>&nbsp;
+            <a href="/tags/nlp/">nlp</a>&nbsp;
           
-            <a href="/tags/boosting/">boosting</a>&nbsp;
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto">
+        <a href="/2020/05/05/HMM/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/Y7H5bvGjiQrwIFP.png" srcset="/img/loading.gif" alt="HMM"
+               class="index-img img-fluid rounded index-thumbnails">
+        </a>
+      </div>
+    
+    <div class="col-12 col-md-8 mx-auto index-info">
+      <a href="/2020/05/05/HMM/">
+        <p class="h4 index-header">HMM</p>
+      </a>
+
+      <a href="/2020/05/05/HMM/">
+        
+        
           
-            <a href="/tags/gbdt/">gbdt</a>&nbsp;
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">隐马尔科夫模型（Hidden Markov Model，HMM）
+\begin{align}
+\end{align}1 隐马尔科夫模型定义状态集合Q=\left\{q_{1},q_{2},\ldots ,q_{N}\right\}
+观测集合\begin{align} &amp; V=\left\{v_{1},v_{2},\ldots ,v_{M}\right\} \quad  \left| V\right| =M  \end{align}  
+状态序列\begin{align} &amp; I=\left\{i_{1},i_{2},\ldots ,i_{t},\ldots,i_{T}\righ</div>
+        </div>
+      </a>
+
+      <div class="index-btm">
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
           
-            <a href="/tags/xgboost/">xgboost</a>&nbsp;
+            <a href="/categories/Machine-Learning/">Machine Learning</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nlp/">nlp</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto">
+        <a href="/2020/05/05/LDA/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/bMnltBuR5DsYwpT.png" srcset="/img/loading.gif" alt="LDA"
+               class="index-img img-fluid rounded index-thumbnails">
+        </a>
+      </div>
+    
+    <div class="col-12 col-md-8 mx-auto index-info">
+      <a href="/2020/05/05/LDA/">
+        <p class="h4 index-header">LDA</p>
+      </a>
+
+      <a href="/2020/05/05/LDA/">
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">潜在狄利克雷分配（latent Dirichlet allocation, LDA）
+\begin{align}
+\end{align}
+潜在狄利克雷分配模型定义：  
+单词集合
+W=\left\{w_1,w_2,\cdots,w_v,\cdots,w_V\right\}其中，$w_v$是第$v$个单词，$v=1,2,\cdots,V$，$V$是单词的个数。  
+文本集合  
+D=\left\{\mathbf{w}_1,\mathbf{w}_2,\cdots,\mathbf{w}_m,\cdots,\mathbf{w}_M\right\}其中，$\mathbf{w}_m$是第$m$个文本，$m</div>
+        </div>
+      </a>
+
+      <div class="index-btm">
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Machine-Learning/">Machine Learning</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nlp/">nlp</a>&nbsp;
+          
+            <a href="/tags/topic-model/">topic model</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto">
+        <a href="/2020/05/05/MCMC/" target="_self">
+          <img src="https://i.loli.net/2020/05/05/Y7H5bvGjiQrwIFP.png" srcset="/img/loading.gif" alt="MCMC"
+               class="index-img img-fluid rounded index-thumbnails">
+        </a>
+      </div>
+    
+    <div class="col-12 col-md-8 mx-auto index-info">
+      <a href="/2020/05/05/MCMC/">
+        <p class="h4 index-header">MCMC</p>
+      </a>
+
+      <a href="/2020/05/05/MCMC/">
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">马尔科夫链蒙特卡罗法（Markov Chain Monte Carlo，MCMC）
+\begin{align}
+\end{align}1 蒙特卡洛法蒙特卡洛法要解决的问题是，假设概率分布的定义已知，通过抽样获得概率分布的随机样本，并通过得到的随机样本对概率分布的特征进行分析。
+蒙特卡洛的法有直接抽样法、接受-拒绝抽样法、重要性抽样法等，其核心是随机抽样。
+接受-拒绝算法：输入：抽样的目标概率分布的概率密度函数$p\left(x\right)$；输出：概率分布的随机样本$x_1,x_2,\cdots,x_n$。  
+
+选择概率密度函数为$q\left(x\right)$的概率分布作为建议分布，使</div>
+        </div>
+      </a>
+
+      <div class="index-btm">
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-05-05&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Machine-Learning/">Machine Learning</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/topic-model/">topic model</a>&nbsp;
+          
+            <a href="/tags/markov-chain/">markov chain</a>&nbsp;
+          
+            <a href="/tags/monte-carlo/">monte carlo</a>&nbsp;
+          
+            <a href="/tags/metropolis-hastings/">metropolis hastings</a>&nbsp;
+          
+            <a href="/tags/gibbs-sampling/">gibbs sampling</a>&nbsp;
           
         
       </div>
@@ -369,6 +647,18 @@ f\left(x\right)=\sum_{m=1}^M\beta_m b\left(x;\gamma_m\ri</div>
   </div>
 
 
+
+  <nav aria-label="index posts navigation">
+    <span class="pagination pg-blue justify-content-center mt-5" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fas fa-angle-double-right"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
 
 
 
@@ -450,6 +740,10 @@ f\left(x\right)=\sum_{m=1}^M\beta_m b\left(x;\gamma_m\ri</div>
 
 
 
+
+
+  
+<script src="/js/custom.js"></script>
 
 
 

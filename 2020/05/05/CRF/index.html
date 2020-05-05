@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>CRF - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="条件随机场（Conditional-Random-Field，CRF）"><a href="#条件随机场（Conditional-Random-Field，CRF）" class="headerlink" title="条件随机场（Conditional Random Field，CRF）"></a>条件随机场（Conditional Random Field，CRF）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><p>图是由结点及连接结点的编组成的集合。<br>结点记作$v$，结点集合记作$V$；边记作$e$，边的集合记作$E$；图记作$G=\left(V,E\right)$。</p>
+<p>概率图模型是由图表示的概率分布。设由联合分布$P\left(Y\right)$，$Y \in \mathcal{Y}$是一组随机变量。<br>由无向图$G=\left(V,E\right)$表示概率分布$P\left(Y\right)$，即在图$G$中，结点$v \in V$表示一个随机变量$Y_{v}$，$Y=\left(Y_{v}\right)_{v \in V}$；边$e \in E$表示随机变量之间的概率依赖关系。</p>
+<p>成对马尔可夫性<br>\begin{align} \\&amp; P\left(Y_{u},Y_{v}|Y_{O}\right)=P\left(Y_{u}|Y_{O}\right)P\left(Y_{v}|Y_{O}\right)\end{align}<br>其中，设$u$和$v$是无向图$G$中任意两个没有边连接的结点，分别对应随机变量$Y_{u}$和$Y_{v}$；其它所有结点为$O$，对应的随机变量组是$Y_{O}$。<br>即，给定随机变量组$Y_{O}$的条件下随机变量$Y_{u}$和$Y_{v}$是条件独立的。</p>
+<p>局部马尔可夫性<br>\begin{align} \\&amp; P\left(Y_{v},Y_{O}|Y_{W}\right)=P\left(Y_{v}|Y_{W}\right)P\left(Y_{O}|Y_{W}\right)\end{align}<br>其中，设$v \in V$是无向图$G$中任意一个结点，对应的随机变量是$Y_{v}$。$W$是与$v$有边连接的所有的结点，对应的随机变量组是$Y_{W}$。$O$是$v,W$以外的其它所有结点，对应的随机变量组是$Y_{O}$。<br>即，给定随机变量组$Y_{W}$的条件下随机变量$Y_{v}$和$Y_{O}$是条件独立的。</p>
+<p>全局马尔可夫性<br>\begin{align} \\&amp; P\left(Y_{A},Y_{B}|Y_{C}\right)=P\left(Y_{A}|Y_{C}\right)P\left(Y_{B}|Y_{C}\right)\end{align}<br>其中，设结点集合$A,B$是在无向图$G$中被结点集合$C$分开的任意结点集合，对应的随机变量组是$Y_{A},Y_{B},Y_{C}$。<br>即，给定随机变量组$Y_{C}$的条件下随机变量$Y_{A}$和$Y_{B}$是条件独立的。</p>
+<p>概率无向图模型（马尔可夫随机场）：设有联合概率分布$P\left(Y\right)$，由无向图$G=\left(V,E\right)$表示，在图$G$中，结点表示随机变量，边表示随机变量之间的依赖关系。如果联合概率分布$P\left(Y\right)$满足成对、局部或全局马尔可夫性，就称次联合概率分布为概率无向图模型，或马尔可夫随机场。</p>
+<p>团：无向图$G$中任意两个结点均有边连接的结点子集。<br>最大团：无向图$G$中的一个团，并且不能再加进任何一个结点使其成为一个更大的团。</p>
+<p>概率无向图模型的联合概率分布<br>\begin{align} \\&amp; P\left(Y\right)=\dfrac{1}{Z} \prod_{C} \varPsi_{C}\left(Y_{C}\right) \end{align}<br>其中，$C$是无向图的最大团，$Y_{C}$是$C$的结点对应的随机变量；势函数$\varPsi_{C}\left(Y_{C}\right)$是严格正的<br>\begin{align} \\&amp; \varPsi_{C}\left(Y_{C}\right) = \exp \left\{-E\left(Y_{C}\right)\right\} \end{align}<br>$Z$是规范化因子，保证$P\left(Y\right)$构成一个概率分布<br>\begin{align} \\&amp; Z = \sum_{Y} \prod_{C} \varPsi_{C}\left(Y_{C} \right) \end{align}<br>乘积是在无向图所有的最大团上进行的。</p>
+<p>设$X$与$Y$是随机变量，$P\left(Y|X\right)$是在给定$X$的条件下$Y$的条件概率分布，若随机变量$Y$构成一个由无向图$G=\left(V,E\right)$表示的马尔可夫随机场，即<br>\begin{align} \\&amp; P\left(Y_{v}|X,Y_{w},w \neq v \right)= P\left(X,Y_{w},w \thicksim v \right)\end{align}<br>对任意结点$v$成立，则称条件概率分布$P\left(Y|X\right)$为条件随机场。其中，$w \thicksim v$表示在图$G=\left(V,E\right)$中与结点$v$有边连接的所有结点$w$，$w \neq v$表示结点$v$以外的所有结点，$Y_{v}$与$Y_{w}$为结点$v$与$w$对应的随机变量。</p>
+<p>设$X=\left(X_{1},X_{2}, \cdots, X_{n}\right)$，$Y=\left(Y_{1},Y_{2}, \cdots, Y_{n}\right)$均为线性链表示的随机变量序列，若在给定随机变量序列$X$的条件下，随机变量序列$Y$的条件概率分布$P\left(Y|X\right)$构成条件随机场，即满足马尔可夫性<br>\begin{align} \\&amp; P\left(Y_{i}|X,Y_{1},\cdots,Y_{i-1},Y_{i+1},\cdots,Y_{n} \right)= P\left(Y_{i}|X,Y_{i-1},Y_{i+1}\right)\end{align}<br>称条件概率分布$P\left(Y|X\right)$为线性链条件随机场。</p>
+<p>线性链条件随机场的参数化形式<br>设$P\left(Y|X\right)$为线性链条件随机场，则在随机变量$X$取值为$x$的条件下，随机变量$Y$取值为$y$的条件概率<br>\begin{align} \\&amp; P\left(y|x\right)= \dfrac{1}{Z\left(x\right)} \exp \left(\sum_{i,k} \lambda_{k} t_{k} \left(y_{i-1},y_{i},x,i\right)+\sum_{i,l} \mu_{l}s_{l} \left(y_{i},x,i\right) \right)\end{align}<br>其中，<br>\begin{align} \\&amp; Z\left(x\right) = \sum_{y} \exp \left(\sum_{i,k} \lambda_{k} t_{k} \left(y_{i-1},y_{i},x,i\right)+\sum_{i,l} \mu_{l}s_{l} \left(y_{i},x,i\right) \right)\end{align}<br>$t_{k}$是定义在边上特征函数，称为转移特征，依赖于当前和前一个位置；$s_{l}$是定义在结点上的特征函数，称为状态特征，依赖于当前位置。特征函数$t_{k}$和$s_{l}$取值为1或0。$\lambda_{k}$和$\mu_{l}$是对应的权值，$Z\left(x\right)$是规范化因子，求和是在所有可能的输出序列上进行的。</p>
+<p>线性链条件随机场的简化化形式<br>设有$K_{1}$个转移特征，$K_{2}$个状态特征，$K=K_{1}+K_{2}$，记<br>\begin{align} f_{k}\left(y_{i-1},y_{i},x,i\right) = \left\{<br>\begin{aligned}<br>\ &amp;  t_{k}\left(y_{i-1},y_{i},x,i\right), \quad k=1,2,\cdots,K_{1}<br>\\ &amp; s_{l}\left(y_{i},x,i\right), \quad k=K_{1}+l; \quad l=1,2,\cdots,K_{2}<br>\end{aligned}<br>\right.\end{align} </p>
+<p>转移与状态特征在各个位置$i$求和，记作<br>\begin{align} \\&amp; f_{k} \left(y,x\right) = \sum_{i=1}^{n} f_{k}\left(y_{i-1},y_{i},x,i\right), \quad k=1,2, \cdots,K\end{align}</p>
+<p>用$w_{k}$表示特征$f_{k}\left(y,x\right)$的权值，即<br>\begin{align} w_{k} = \left\{<br>\begin{aligned}<br>\ &amp;  \lambda_{k}, \quad k=1,2,\cdots,K_{1}<br>\\ &amp; \mu_{l}, \quad k=K_{1}+l; \quad l=1,2,\cdots,K_{2}<br>\end{aligned}<br>\right.\end{align} </p>
+<p>则条件随机场可表示为<br>\begin{align} \\&amp; P\left(y|x\right)= \dfrac{1}{Z\left(x\right)} \exp \sum_{k=1}^{K} w_{k} f_{k}\left(y,x\right)<br>\\ &amp; Z\left(x\right) = \sum_{y} \exp \sum_{k=1}^{K} w_{k} f_{k}\left(y,x\right) \end{align}</p>
+<p>以$w$表示权值向量，即<br>\begin{align} \\&amp; w=\left(w_{1},w_{2}, \cdots, w_{K}\right)^{T}\end{align}</p>
+<p>以$F\left(y,x\right)$表示权局特征向量，即<br>\begin{align} \\&amp; F\left(y,x\right) = \left(f_{1}\left(y,x\right),f_{2}\left(y,x\right), \cdots, f_{K}\left(y,x\right)\right)^{T} \end{align}</p>
+<p>则条件随机场可写成向量$w$与$F\left(y,x\right)$的内积的形式<br>\begin{align} \\&amp; P\left(y|x\right) = \dfrac{\exp \left(w \cdot F\left(y,x\right)\right)}{Z_{w}\left(x\right)} \end{align}<br>其中，<br>\begin{align} \\&amp; Z_{w}\left(x\right) = \sum_{y} \exp \left(w \cdot F\left(y,x\right)\right) \end{align}</p>
+<p>假设$P_{w}\left(y|x\right)$是线性链条件随机场对给定观测序列$x$，相应的标记序列$y$的条件概率。引进特殊的起点标记$y_{0}=start$表示开始状态，特殊的终点标记$y_{n+1}=stop$表示终止状态。对观测序列$x$的每一个位置$i=1,2,\cdots,n+1$，定义一个$m$阶矩阵（$m$是标记$y_{i}$取值的个数）<br>\begin{align} \\&amp; M_{i}\left(x\right) = \left[ M_{i} \left(y_{i-1},y_{i}|x\right) \right]_{m \times m}<br>\\ &amp; M_{i} \left(y_{i-1},y_{i}|x\right) = \exp \left(W_{i} \left(y_{i-1},y_{i},|x\right)\right)<br>\\ &amp; W_{i} \left(y_{i-1},y_{i},|x\right) = \sum_{i=1}^{K} w_{k} f_{k} \left(y_{i-1},y_{i},x,i\right)\end{align}<br>则<br>\begin{align} \\&amp; P_{w}\left(y|x\right) = \dfrac{1}{Z_{w}\left(x\right)} \prod_{i=1}^{n+1} M_{i} \left(y_{i-1},y_{i}|x\right)\end{align}<br>其中，$Z_{w}$为规范化因子，是$n+1$个矩阵的乘积的元素，是以$start$为起点$stop$为终点通过状态的所有路径$y_{1}y_{2}\cdots y_{n}$的非规范化概率$\prod_{i=1}^{n+1} M_{i} \left(y_{i-1},y_{i}|x\right)$之和。<br>\begin{align} \\&amp; Z_{w}\left(x\right) = \left(M_{1}\left(x\right),M_{2}\left(x\right), \cdots,M_{n+1}\left(x\right)\right)_{start,stop}\end{align}</p>
+<p>对每个指标$i=0,1,\cdots,n+1$，定义前向向量$\alpha_{i}\left(x\right)$<br>\begin{align} \alpha_{0}\left(y|x\right) = \left\{<br>\begin{aligned}<br>\ &amp;  1, \quad y=start<br>\\ &amp; 0, \quad 否则<br>\end{aligned}<br>\right.\end{align}<br>递推公式<br>\begin{align} \\&amp; \alpha_{i}^{T}\left(y_{i}|x\right) = \alpha_{i-1}^{T}\left(y_{i}|x\right) \left[M_{i}\left(y_{i-1},y_{i}|x\right)\right], \quad i=1,2,\cdots,n+1\end{align}<br>又表示为<br>\begin{align} \\&amp; \alpha_{i}^{T} \left(x\right) = \alpha_{i-1}^{T} \left(x\right) M_{i}\left(x\right)\end{align}<br>$\alpha_{i}\left(y_{i}|x\right)$表示在位置$i$的标记是$y_{i}$并且到位置$i$的前部分标记序列的非规范化概率，$y_{i}$可取的值又$m$个，所以$\alpha_{i}\left(x\right)$是$m$维列向量。</p>
+<p>对每个指标$i=0,1,\cdots,n+1$，定义后向向量$\beta_{i}\left(x\right)$<br>\begin{align} \beta_{n+1}\left(y_{n+1}|x\right) = \left\{<br>\begin{aligned}<br>\ &amp;  1, \quad y_{n+1}=stop<br>\\ &amp; 0, \quad 否则<br>\end{aligned}<br>\right.\end{align}<br>递推公式<br>\begin{align} \\&amp; \beta_{i}\left(y_{i}|x\right) = \left[M_{i}\left(y_{i},y_{i+1}|x\right)\right]\beta_{i+1}\left(y_{i+1}|x\right) , \quad i=1,2,\cdots,n+1\end{align}<br>又表示为<br>\begin{align} \\&amp; \beta_{i} \left(x\right) = M_{i+1}\left(x\right) \beta_{i+1} \left(x\right) \end{align}<br>$\beta_{i}\left(y_{i}|x\right)$表示在位置$i$的标记是$y_{i}$并且到位置$i+1$到$n$的后部分标记序列的非规范化概率。</p>
+<p>由前向－后向向量，得<br>\begin{align} \\&amp; Z\left(x\right)=\alpha_{n}^{T}\left(x\right) \cdot \mathbf{1} = \mathbf{1}^{T} \cdot \beta_{i}\left(x\right) \end{align}<br>其中，$\mathbf{1}$是元素均为1的$m$维列向量。 </p>
+<p>标记序列中，在位置$i$是标记$y_{i}$的条件概率<br>\begin{align} \\&amp; P\left(Y_{i}=y_{i}|x\right) = \dfrac{\alpha_{i}^{T}\left(y_{i}|x\right) \beta_{i}\left(y_{i}|x\right)}{Z\left(x\right)}\end{align}</p>
+<p>标记序列中，在位置$i－1$是标记$y_{i-1}$，在位置$i$是标记$y_{i}$的条件概率<br>\begin{align} \\&amp; P\left(Y_{i－1}=y_{i-1},Y_{i}=y_{i}|x\right) = \dfrac{\alpha_{i-1}^{T}\left(y_{i-1}|x\right) M_{i}\left(y_{i-1},y_{i}|x\right)\beta_{i}\left(y_{i}|x\right)}{Z\left(x\right)}\end{align}</p>
+<p>其中，<br>\begin{align} \\&amp; Z\left(x\right)=\alpha_{n}^{T}\left(x\right) \cdot \mathbf{1}  \end{align}</p>
+<p>特征函数$f_{k}$关于条件分布$P\left(Y|X\right)$的数学期望<br>\begin{align} \\&amp; E_{P\left(Y|X\right)} \left[f_{k}\right]=\sum_{y} P\left(y|x\right) f_{k}\left(y,x\right)<br>\\ &amp; = \sum_{i=1}^{n+1} \sum_{y_{i-1},y_{i}} f_{k}\left(y_{i-1},y_{i},x,i\right) \dfrac{\alpha_{i-1}^{T}\left(y_{i-1}|x\right) M_{i}\left(y_{i-1},y_{i}|x\right)\beta_{i}\left(y_{i}|x\right)}{Z\left(x\right)}\end{align}</p>
+<p>假设经验分布为$\tilde{P}\left(x\right)$，特征函数$f_{k}$关于联合分布$P\left(X,Y\right)$的数学期望<br>\begin{align} \\&amp; E_{P\left(X,Y\right)} \left[f_{k}\right]=\sum_{x,y} P\left(x,y\right) \sum_{i=1}^{n+1} f_{k}\left(y_{i-1},y_{i},x,i\right)<br>\\ &amp; = \sum_{x} \tilde{P}\left(x\right) \sum_{y} P\left(y|x\right) \sum_{i=1}^{n+1} f_{k}\left(y_{i-1},y_{i},x,i\right)<br>\\ &amp; = \sum_{x} \tilde{P}\left(x\right) \sum_{i=1}^{n+1} \sum_{y_{i-1},y_{i}} f_{k}\left(y_{i-1},y_{i},x,i\right) \dfrac{\alpha_{i-1}^{T}\left(y_{i-1}|x\right) M_{i}\left(y_{i-1},y_{i}|x\right)\beta_{i}\left(y_{i}|x\right)}{Z\left(x\right)} \quad \quad k=1,2,\cdots,K<br>\end{align}</p>
+<p>其中，<br>\begin{align} \\&amp; Z\left(x\right)=\alpha_{n}^{T}\left(x\right) \cdot \mathbf{1}  \end{align}</p>
+<p>由训练数据集，得经验概率分布$\tilde{P}\left(X,Y\right)$。<br>训练数据的对数似然函数<br>\begin{align} \\&amp; L\left(w\right)= L_{\tilde{P}}\left(P_{w}\right)=\log \prod_{x,y} P_{w}\left(y|x\right)^{\tilde{P}\left(x,y\right)} = \sum_{x,y} \tilde{P}\left(x,y\right) \log P_{w}\left(y|x\right)\end{align}</p>
+<p>当$P_{w}$是条件随机场模型时，对数似然函数<br>\begin{align} \\&amp; L\left(w\right)= \sum_{x,y} \tilde{P}\left(x,y\right) \log P_{w}\left(y|x\right)<br>\\ &amp; = \sum_{x,y} \left[\tilde{P}\left(x,y\right) \sum_{k=1}^{K} w_{k} f_{k}\left(y,x\right) - \tilde{P}\left(x,y\right) \log Z_{w}\left(x\right) \right]<br>\\ &amp; = \sum_{j=1}^{N} \sum_{k=1}^{K} w_{k} f_{k} \left(y_{j},x_{j}\right) - \sum_{j=1}^{N} \log Z_{w} \left(x_{j}\right) \end{align}</p>
+<p>设模型当前参数向量<br>\begin{align} \\&amp; w = \left(w_{1},w_{2},\cdots,w_{K}\right)^{T}\end{align}<br>向量的增量<br>\begin{align} \\&amp; \delta = \left(\delta_{1},\delta_{2},\cdots,\delta_{K}\right)^{T}\end{align}<br>更新参数向量<br>\begin{align} \\&amp; w+\delta = \left(w_{1}+\delta_{1},w_{2}+\delta_{2},\cdots,w_{K}+\delta_{K}\right)^{T}\end{align}</p>
+<p>关于转移特征$t_{k}$的更新方程<br>\begin{align} \\&amp; E_{\tilde{P}} \left[t_{k}\right]=\sum_{x,y} \tilde{P} \left(x,y\right) \sum_{i=1}^{n+1} t_{k}\left(y_{i-1},y_{i},x,i\right)<br>\\ &amp; = \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n+1} t_{k}\left(y_{i-1},y_{i},x,i\right)\exp\left(\delta_{k}T\left(x,y\right)\right) \quad \quad k=1,2,\cdots,K<br>\end{align}</p>
+<p>关于转移特征$s_{l}$的更新方程<br>\begin{align} \\&amp; E_{\tilde{P}} \left[s_{l}\right]=\sum_{x,y} \tilde{P} \left(x,y\right) \sum_{i=1}^{n} s_{l}\left(y_{i},x,i\right)<br>\\ &amp; = \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n} s_{l}\left(y_{i},x,i\right)\exp\left(\delta_{K_{1}+l}T\left(x,y\right)\right) \quad \quad l=1,2,\cdots,K_{2}<br>\end{align}</p>
+<p>其中，$T\left(x,y\right)$是在数据$\left(x,y\right)$中出现的所有特征函数的总和<br>\begin{align} \\&amp; T\left(x,y\right)=\sum_{k} f_{k}\left(y,x\right)=\sum_{k=1}^{K} \sum_{i=1}^{n+1} f_{k} \left(y_{i-1},y_{i},x,i\right)\end{align}</p>
+<p>条件随机场模型学习的改进的迭代尺度法：<br>输入：特征函数$t_{1},t_{2},\cdots,t_{K_{1}}$，$s_{1},s_{2},\cdots,s_{K_{2}}$，经验分布$\tilde{P}\left(x,y\right)$<br>输出：参数估计值$\hat{w}\quad$ 模型$P_{\hat{w}}$ </p>
+<ol>
+<li>对所有$k \in \left\{1,2,\cdots,K\right\}$，取初值$w_{k}=0$ </li>
+<li>对每一个$k \in \left\{1,2,\cdots,K\right\}$<br>2.1当$k=1,2,\cdots,K_{1}$时，令$\delta_{k}$是方程<br>\begin{align} \\&amp; \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n+1} t_{k}\left(y_{i-1},y_{i},x,i\right)\exp\left(\delta_{k}T\left(x,y\right)\right)=E_{\tilde{P}} \left[t_{k}\right]<br>\end{align}<br>的解<br>当$k=K_{1}+l,l=1,2,\cdots,K_{2}$时，令$\delta_{K_{1}+l}$是方程<br>\begin{align} \\&amp;  \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n} s_{l}\left(y_{i},x,i\right)\exp\left(\delta_{K_{1}+l}T\left(x,y\right)\right)=E_{\tilde{P}} \left[s_{l}\right]<br>\end{align}<br>的解<br>2.2更新$w_{k}$的值：$w_{k} \leftarrow w_{k}+\delta_{k}$  </li>
+<li>如果不是所有的$w_{k}$都收敛，重复步骤2.<br>其中，<br>\begin{align} \\&amp; T\left(x,y\right)=\sum_{k} f_{k}\left(y,x\right)=\sum_{k=1}^{K} \sum_{i=1}^{n+1} f_{k} \left(y_{i-1},y_{i},x,i\right)\end{align}</li>
+</ol>
+<p>算法$S$是解决$T\left(x,y\right)$表示数据$\left(x,y\right)$中特征总数时，对不同数据$\left(x,y\right)$取值可能不同的问题。引入松弛特征<br>\begin{align} \\&amp; s\left(x,y\right) = S - \sum_{i=1}^{n+1} \sum_{k=1}^{K} f_{k} \left(y_{i-1},y_{i},x,i\right)\end{align}<br>其中，$S$是一个常数。选取足够大的常数$S$使得对训练数据集的所有数据$\left(x,y\right)$，$s\left(x,y\right) \geq 0$成立。这时特征总数可取$S$。</p>
+<p>对转移特征$t_{k}$，$\delta_{k}$的更新方程<br>\begin{align} \\&amp; \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n+1} t_{k}\left(y_{i-1},y_{i},x,i\right)\exp\left(\delta_{k}S\right)=E_{\tilde{P}} \left[t_{k}\right]<br>\\ &amp; \delta_{k}=\dfrac{1}{S} \log \dfrac{E_{\tilde{P}}\left[t_{k}\right]}{E_{P}\left[t_{k}\right]}\end{align}<br>其中，<br>\begin{align} \\&amp; E_{P} \left[t_{k}\right]=\sum_{x} \tilde{P}\left(x\right) \sum_{i=1}^{n+1} \sum_{y_{i-1},y_{i}} t_{k}\left(y_{i-1},y_{i},x,i\right) \dfrac{\alpha_{i-1}^{T}\left(y_{i-1}|x\right) M_{i}\left(y_{i-1},y_{i}|x\right)\beta_{i}\left(y_{i}|x\right)}{Z\left(x\right)}<br>\end{align}</p>
+<p>对状态特征$s_{l}$，$\delta_{k}$的更新方程<br>\begin{align} \\&amp; \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n} s_{l}\left(y_{i},x,i\right)\exp\left(\delta_{K_{1}}S\right)=E_{\tilde{P}} \left[s_{l}\right]<br>\\ &amp; \delta_{K_{1}+l}=\dfrac{1}{S} \log \dfrac{E_{\tilde{P}}\left[s_{l}\right]}{E_{P}\left[s_{l}\right]}\end{align}<br>其中，<br>\begin{align} \\&amp; E_{P} \left[s_{l}\right]=\sum_{x} \tilde{P}\left(x\right) \sum_{i=1}^{n} \sum_{y_{i-1},y_{i}} s_{l}\left(y_{i},x,i\right) \dfrac{\alpha_{i}^{T}\left(y_{i-1}|x\right) \beta_{i}\left(y_{i}|x\right)}{Z\left(x\right)}<br>\end{align}</p>
+<p>算法$T$是解决算法$S$每步迭代增量向量变大，算法收敛变慢问题。对每个观测序列$x$计算其特征总数最大值$T\left(x\right)$<br>\begin{align} \\&amp; T\left(x\right) = \max_{y} T\left(x,y\right)=t\end{align}</p>
+<p>关于转移特征参数的更新方程<br>\begin{align} \\&amp; E_{\tilde{P}} \left[t_{k}\right]=\sum_{x,y} \tilde{P} \left(x\right)  P\left(y|x\right) \sum_{i=1}^{n+1} t_{k}\left(y_{i-1},y_{i},x,i\right)\exp\left(\delta_{k}T\left(x,y\right)\right)<br>\\ &amp; = \sum_{x} \tilde{P} \left(x\right) \sum_{y} P\left(y|x\right) \sum_{i=1}^{n+1} t_{k}\left(y_{i-1},y_{i},x,i\right)\exp\left(\delta_{k}T\left(x,y\right)\right)<br>\\ &amp; = \sum_{x} \tilde{P}\left(x\right) a_{k,t} \exp\left(\delta_k \cdot t\right)<br>\\ &amp; = \sum_{t=0}^{T_{max}} a_{k,t} \beta_{k}^{t}<br>\end{align}<br>其中，$a_{k,t}$是特征$t_{k}$的期望，$\delta_{k}=\log \beta_{k}$，$\beta_{k}$是多项式方程唯一的实根，可以用牛顿法求得，从而得$\delta_{k}$。</p>
+<p>关于状态特征的参数更新方程<br>\begin{align} \\&amp; E_{\tilde{P}} \left[s_{l}\right]= \sum_{x,y} \tilde{P} \left(x\right) P\left(y|x\right) \sum_{i=1}^{n} s_{l}\left(y_{i},x,i\right)\exp\left(\delta_{K_{1}+l}T\left(x,y\right)\right)<br>\\ &amp; = \sum_{x} \tilde{P} \left(x\right) \sum_{y} P\left(y|x\right) \sum_{i=1}^{n} s_{l}\left(y_{i},x,i\right)\exp\left(\delta_{K_{1}+l}T\left(x,y\right)\right)<br>\\ &amp; = \sum_{x} \tilde{P} \left(x\right) b_{l,t} \exp \left(\delta_{k} \cdot t\right)<br>\\ &amp; = \sum_{t=0}^{T_{max}} b_{l,t} \gamma_{l}^{t}<br>\end{align}<br>其中，$b_{l,t}$是特征$s_{l}$的期望，$\delta_{l}=\log \gamma_{l}$，$\gamma_{l}$是多项式方程唯一的实根，可以用牛顿法求得。</p>
+<p>条件随机场的预测问题是给定条件随机场$P\left(Y|X\right)$和输入序列（观测序列）$x$，求条件概率最大的输出序列（标记序列）$y^{*}$，即对观测序列进行标注。<br>即，</p>
+<script type="math/tex; mode=display">
+\begin{align}  y^{*}&=\arg\max_{y}P_{w}\left(y|x\right)
+\\ & = \arg\max_{y} \dfrac{\exp \left(w \cdot F\left(y,x\right)\right)}{Z_{w}\left(x\right)}
+\\ & = \arg\max_{y} \exp \left(w \cdot F\left(y,x\right)\right)
+\\ & = \arg\max_{y} \left(w \cdot F\left(y,x\right)\right) 
+\end{align}</script><p>其中，<br>\begin{align} w &amp;=\left(w_{1},w_{2},\cdots,w_{K}\right)^{T}<br>\\ F\left(y,x\right)&amp;=\left(f_{1}\left(y,x\right),f_{2}\left(y,x\right),\cdots,f_{K}\left(y,x\right)\right)^{T}<br>\\ f_{k}\left(y,x\right)&amp;=\sum_{i=1}^{n} f_{k} \left(y_{i-1},y_{i},x,i\right),\quad \quad k=1,2,\cdots,K<br>\end{align}<br>等价的<br>\begin{align} \\&amp; \max_{y} \sum_{i=1}^{n} w \cdot F_{i} \left(y_{i-1},y_{i},x\right)\end{align}<br>其中，<br>\begin{align} \\&amp; F_{i}\left(y_{i-1},y_{i},x\right) = \left(f_{1}\left(y_{i-1},y_{i},x,i\right),f_{2}\left(y_{i-1},y_{i},x,i\right),\cdots,f_{K}\left(y_{i-1},y_{i},x,i\right)\right)^{T}\end{align}</p>
+<p>条件随机场预测的维特比算法：<br>输入：模型特征函数$F\left(y,x\right)$和权值向量$w$，观测序列$x=\left(x_{1},x_{2},\cdots,x_{n}\right)$<br>输出：最优序列$y^{<em>}=\left(y_{1}^{</em>},y_{2}^{<em>},\cdots,y_{n}^{</em>}\right)$ </p>
+<ol>
+<li>初始化<br>\begin{align} \\&amp; \delta_{1}\left(j\right)=w \cdot F_{1}\left(y_{0}=start,y_{1}=j,x\right),\quad j=1,2,\cdots,m\end{align}</li>
+<li>递推，对$i=2,3,\cdots,n$<br>\begin{align} \\&amp; \delta_{i}\left(l\right)=\max_{1 \leq j \leq m}\left\{\delta_{i-1}\left(j\right)+w \cdot F_{i}\left(y_{i-1}=j,y_{i}=l,x\right)\right\},\quad l=1,2,\cdots,m<br>\\ &amp; \varPsi_{i}\left(l\right) = \arg \max_{1 \leq j \leq m}\left\{\delta_{i-1}\left(j\right)+w \cdot F_{i}\left(y_{i-1}=j,y_{i}=l,x\right)\right\},\quad l=1,2,\cdots,m\end{align}</li>
+<li>终止<br>\begin{align} \\&amp; \max_{y} \left(w \cdot F\left(y,x\right)\right)=\max_{1 \leq j \leq m} \delta_{n}\left(j\right)<br>\\ &amp; y_{n}^{*}=\arg \max_{1 \leq j \leq m}\delta_{n}\left(j\right) \end{align}</li>
+<li>返回路径<script type="math/tex; mode=display">y_{i}^{*}=\varPsi_{i+1}\left(y_{i+1}^{*}\right),\quad i=n-1,n-2,\cdots,1</script>最优路径<script type="math/tex; mode=display">y_{i}^{*}=\left(y_{1}^{*},y_{2}^{*},\cdots,y_{n}^{*}\right)</script></li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Machine-Learning/">Machine Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/Convolutional-Nerual-Network/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">Convolutional_Nerual_Network</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/HMM/">
+                        <span class="hidden-mobile">HMM</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "CRF&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

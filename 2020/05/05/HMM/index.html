@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>HMM - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="隐马尔科夫模型（Hidden-Markov-Model，HMM）"><a href="#隐马尔科夫模型（Hidden-Markov-Model，HMM）" class="headerlink" title="隐马尔科夫模型（Hidden Markov Model，HMM）"></a>隐马尔科夫模型（Hidden Markov Model，HMM）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-隐马尔科夫模型定义"><a href="#1-隐马尔科夫模型定义" class="headerlink" title="1 隐马尔科夫模型定义"></a>1 隐马尔科夫模型定义</h2><p>状态集合<script type="math/tex">Q=\left\{q_{1},q_{2},\ldots ,q_{N}\right\}</script></p>
+<p>观测集合\begin{align} &amp; V=\left\{v_{1},v_{2},\ldots ,v_{M}\right\} \quad  \left| V\right| =M  \end{align}  </p>
+<p>状态序列\begin{align} &amp; I=\left\{i_{1},i_{2},\ldots ,i_{t},\ldots,i_{T}\right\}  \quad i_{t}\in Q  \quad \left(t=1,2,\ldots,T \right)\end{align}  </p>
+<p>观测序列\begin{align} &amp; O=\left\{o_{1},o_{2},\ldots ,o_{t},\ldots,o_{T}\right\}  \quad o_{t}\in V \quad \left(t=1,2,\ldots,T \right)\end{align}  </p>
+<p>状态转移矩阵 \begin{align} &amp; A=\left[a_{ij}\right]_{N\times N} \end{align}</p>
+<p>在$t$时刻处于状态$q_{i}$的条件下，在$t+1$时刻转移到状态$q_{j}$的概率\begin{align} &amp; a_{ij}= P\left( i_{t+1}=q_{j}|i_{t}=q_{i}\right) \quad \left(i=1,2,\ldots,N \right) \quad \left(j=1,2,\ldots,M \right)\end{align}</p>
+<p>观测概率矩阵\begin{align} &amp; B=\left[b_{j}\left(k\right)\right]_{N\times M} \end{align}</p>
+<p>在$t$时刻处于状态$q_{i}$的条件下，生成观测$v_{k}$的概率\begin{align} &amp; b_{j}\left(k\right)= P\left( o_{t}=v_{k}|i_{t}=q_{j}\right) \quad \left(k=1,2,\ldots,M \right) \quad \left(j=1,2,\ldots,N \right)\end{align}</p>
+<p>初始概率向量\begin{align} &amp; \pi =\left( \pi _{i}\right)  \end{align}</p>
+<p>在时刻$t=1$处于状态$q_{i}$的概率\begin{align} &amp; \pi_{i} =P\left( i_{1}=q_{i}\right) \quad \left(i=1,2,\ldots,N \right) \end{align}</p>
+<p>隐马尔科夫模型\begin{align} &amp; \lambda =\left( A,B.\pi \right)  \end{align}</p>
+<p>隐马尔科夫模型基本假设：</p>
+<ol>
+<li>齐次马尔科夫性假设：在任意时刻$t$的状态只依赖于时刻$t-1$的状态。\begin{align} &amp; P\left( i_{t}|i_{t-1},o_{t-1},\ldots,i_{1},o_{1}\right)=P\left(i_{t}|i_{t-1}\right) \quad \left(t=1,2,\ldots,T\right) \end{align}</li>
+<li>观测独立性假设：任意时刻$t$的观测只依赖于时刻$t$的状态。\begin{align} &amp; P\left( o_{t}|i_{T},o_{T},i_{T-1},o_{T-1},\ldots,i_{t+1},o_{t+1},i_{t},i_{t-1},o_{t-1},\ldots,i_{1},o_{1}\right)=P\left(o_{t}|i_{t}\right) \quad \left(t=1,2,\ldots,T\right) \end{align}</li>
+</ol>
+<p>观测序列生成算法:<br>输入：隐马尔科夫模型$\lambda =\left( A,B.\pi \right)$,观测序列长度$T$;<br>输出：观测序列$O=\left\{o_{1},o_{2},\ldots ,o_{t},\ldots,o_{T}\right\}$；</p>
+<ol>
+<li>由初始概率向量$\pi$产生状态$i_{1}$；</li>
+<li>$t=1$；</li>
+<li>由状态$i_{t}$的观测概率分布$b_{j}\left(k\right)$生成$o_{t}$；</li>
+<li>由状态$i_{t}$的状态转移概率分布$a_{i_{t}i_{t+1}}$生成状态$i_{t+1} \quad \left(i_{t+1}=1,2,\ldots,N\right)$；  </li>
+<li>$t=t+1$；如果$t&lt;T$，转至3.；否则，结束。</li>
+</ol>
+<p>隐马尔科夫模型的3个基本问题：  </p>
+<ol>
+<li>概率计算：已知$\lambda =\left( A,B.\pi \right)$和$O=\left\{o_{1},o_{2},\ldots ,o_{t},\ldots,o_{T}\right\} $，计算$P\left(O| \lambda \right)$</li>
+<li>学习：已知$O=\left\{o_{1},o_{2},\ldots ,o_{t},\ldots,o_{T}\right\}$，计算 $\lambda^* =\arg \max P\left( O|\lambda \right) $</li>
+<li>预测（编码）：已知$\lambda =\left( A,B.\pi \right)$和$O=\left\{o_{1},o_{2},\ldots ,o_{t},\ldots,o_{T}\right\} $，计算 $I^* =\arg \max P\left( I|O \lambda \right) $</li>
+</ol>
+<h2 id="2-概率计算算法"><a href="#2-概率计算算法" class="headerlink" title="2 概率计算算法"></a>2 概率计算算法</h2><p>前向概率 \begin{align} &amp; \alpha _{t}\left( i\right) =P\left(o_{1},o_{2},\ldots ,o_{t}, i_{t}=q_{i}| \lambda \right) \end{align}<br>给定模型$\lambda$，时刻$t$部分观测序列为$o_{1},o_{2},\ldots ,o_{t}$且状态为$q_{i}$的概率。</p>
+<p>前向概率递推计算\begin{align} &amp; \alpha _{t}\left( i\right) =P\left(o_{1},o_{2},\ldots ,o_{t}, i_{t}=q_{i}| \lambda \right)＝P\left(i_{t}=q_{i},o_{1}^t \right) \\ &amp; =\sum _{j=1}^{N}P\left(i_{t-1}=q_{j},i_{t}=q_{i},o_{1}^{t-1},o_{t}\right) \\ &amp; =\sum _{j=1}^{N}P\left(i_{t}=q_{i},o_{t}|i_{t-1}=q_{j},o_{1}^{t-1}\right)\cdot P\left(i_{t-1}=q_{j},o_{1}^{t-1} \right) \\ &amp; =\sum _{j=1}^{N}P\left(i_{t}=q_{i},o_{t}|i_{t-1}=q_{j}\right)\cdot \alpha _{t-1}\left( j\right)\\ &amp; =\sum _{j=1}^{N}P\left(o_{t}|i_{t}=q_{i},i_{t-1}=q_{j}\right)\cdot P\left(i_{t}=q_{i}|i_{t-1}=q_{j}\right)\cdot \alpha _{t-1}\left( j\right) \\ &amp; =\sum _{j=1}^{N}b_{i}\left(o_{t}\right)\cdot a_{ji}\cdot \alpha _{t-1}\left( j\right)\end{align}</p>
+<p>概率计算\begin{align} &amp; P\left(O| \lambda \right) =P\left(o_{1}^{T}| \lambda\right) \\ &amp; = \sum_{i=1}^{N}P\left(o_{1}^{T},i_{T}=q_{i}\right)\\ &amp; = \sum _{i=1}^{N}\alpha _{T}\left( i\right)\end{align} </p>
+<p>观测序列概率计算的前向算法：<br>输入：隐马尔科夫模型$\lambda$,观测序列$O$;<br>输出：观测序列概率$P\left(O| \lambda \right)$；</p>
+<ol>
+<li>初值\begin{align} &amp; \alpha _{1}\left( i\right)= \pi_{i}b_{i}\left(o_{1}\right) \quad \left(t=1,2,\ldots,N\right) \end{align}</li>
+<li>递推  对$t=1,2,\ldots,T-1$ \begin{align} &amp; \alpha _{t+1}\left( i\right) =\sum _{j=1}^{N}b_{i}\left(o_{t+1}\right)\cdot a_{ji}\cdot \alpha _{t}\left( j\right) \quad \left(t=1,2,\ldots,N\right) \end{align}</li>
+<li>终止  \begin{align} &amp; P\left(O| \lambda \right)= \sum _{j=1}^{N}\alpha _{T}\left( i\right)\end{align}</li>
+</ol>
+<p>后向概率 \begin{align} &amp; \beta_{t}\left( i\right) =P\left(o_{t+1},o_{t+2},\ldots ,o_{T}| i_{t}=q_{i} \lambda \right) \end{align}<br>给定模型$\lambda$，时刻$t$状态为$q_{i}$的条件下，从时刻$t+1$到时刻$T$的部分观测序列为$o_{t+1},o_{t+2},\ldots ,o_{T}$的概率。</p>
+<p>后向概率递推计算\begin{align} &amp; \beta _{t}\left( i\right) =P\left(o_{t+1},o_{t+2},\ldots ,o_{T}| i_{t}=q_{i}, \lambda \right)＝P\left(o_{t+1}^T |i_{t}=q_{i}\right) \\ &amp; =\dfrac {P\left(o_{t+1}^{T}, i_{t}=q_{i}\right)} {P\left(i_{t}=q_{i}\right)}\\ &amp; =\dfrac {\sum_{j=1}^{N} P\left(o_{t+1}^{T},i_{t}=q_{i},i_{t+1}=q_{j}\right)}{P\left(i_{t}=q_{i}\right)}\\ &amp; =\sum_{j=1}^{N} \dfrac {P\left(o_{t+1}^{T}|i_{t}=q_{i},i_{t+1}=q_{j}\right) \cdot P\left(i_{t}=q_{i},i_{t+1}=q_{j} \right)}{P\left(i_{t}=q_{i}\right)} \\ &amp; = \sum_{j=1}^{N} P\left(o_{t+1}^{T}|i_{t+1}=q_{j}\right) \cdot \dfrac {P\left(i_{t+1}=q_{j}|i_{t}=q_{i}\right)  \cdot P\left(i_{t}=q_{i} \right)}{P\left(i_{t}=q_{i} \right)} \\ &amp; = \sum_{j=1}^{N} P\left(o_{t+2}^{N},o_{t+1}|i_{t+1}=q_{j}\right) \cdot a_{ij} \\ &amp; = \sum_{j=1}^{N} P\left(o_{t+2}^{T}|i_{t+1}=q_{j}\right) \cdot P\left(o_{t+1}|i_{t+1}=q_{j}\right) \cdot a_{ij} \\ &amp; = \sum_{j=1}^{N} \beta_{t+1}\left(j\right) \cdot b_{j}\left(o_{t+1}\right) \cdot a_{ij}\end{align}</p>
+<p>概率计算\begin{align} &amp; P\left(O| \lambda \right) =P\left(o_{1}^{T}| \lambda\right) \\ &amp; = \sum_{i=1}^{N}P\left(o_{1}^{T},i_{1}=q_{i}\right)\\ &amp; = \sum_{i=1}^{N}P\left(i_{1}=q_{i}\right) \cdot P\left(o_{1}|i_{1}=q_{i}\right)\cdot P\left(o_{2}^{T}|i_{1}=q_{i}\right) \\ &amp; = \sum_{i=1}^{N} \pi_{i} b_{i}\left(o_{1}\right) \beta_{1}\left(i\right)\end{align} </p>
+<p>观测序列概率计算的后向算法：<br>输入：隐马尔科夫模型$\lambda$,观测序列$O$;<br>输出：观测序列概率$P\left(O| \lambda \right)$；</p>
+<ol>
+<li>初值\begin{align} &amp; \beta_{T}\left( i\right)= 1 \quad \left(t=1,2,\ldots,N\right) \end{align}</li>
+<li>递推  对$t=T-1,T-2,\ldots,1$ \begin{align} &amp; \beta_{t}\left( i\right) =\sum_{j=1}^{N} \beta_{t+1}\left(j\right) \cdot b_{j}\left(o_{t+1}\right) \cdot a_{ij} \quad \left(t=1,2,\ldots,N\right) \end{align}</li>
+<li>终止  \begin{align} &amp; P\left(O| \lambda \right)= \sum _{j=1}^{N}\pi_{i} b_{i}\left(o_{1}\right)\beta _{1}\left( i\right) \end{align}</li>
+</ol>
+<p>$P \left( O | \lambda \right)$的前向概率、后向概率的表示<br>\begin{align} \\ &amp; P \left( O | \lambda \right) ＝ P \left( o_{1}^{T} \right)<br>\\ &amp; ＝ \sum_{i=1}^{N} \sum_{j=1}^{N} P \left( o_{1}^{t}, o_{t+1}^{T}, i_{t}=q_{i}, i_{t+1}=q_{j} \right)<br>\\ &amp; ＝ \sum_{i=1}^{N} \sum_{j=1}^{N} P \left( o_{1}^{t},  i_{t}=q_{i}, i_{t+1}=q_{j} \right) P \left( o_{t+1}^{T} | i_{t+1}=q_{j} \right)<br>\\ &amp;  = \sum_{i=1}^{N} \sum_{j=1}^{N} P \left( o_{1}^{t},  i_{t}=q_{i} \right) P \left( i_{t+1}=q_{j} | i_{t}=q_{i} \right) P \left( o_{t+1}^{T} | i_{t+1}=q_{j} \right)<br>\\ &amp; = \sum_{i=1}^{N} \sum_{j=1}^{N} P \left( o_{1}^{t},  i_{t}=q_{i} \right) P \left( i_{t+1}=q_{j} | i_{t}=q_{i} \right) P \left( o_{t+1} | i_{t+1}=q_{j} \right) P \left( o_{t+2}^{T} | i_{t+1}=q_{j} \right)<br>\\ &amp; = \sum_{i=1}^{N} \sum_{j=1}^{N} \alpha_{t} \left( i \right) a_{ij} b_{j} \left( o_{t+1} \right) \beta_{t+1} \left( j \right) \quad \quad \quad t=1, 2, \cdots, T-1\end{align}  </p>
+<p>给定模型$\lambda$和观测$O$，在时刻$t$处于状态$q_{i}$的概率<br>\begin{align} \\ &amp; \gamma_{t} \left( i \right) = P \left( i_{t}=q_{i} | O, \lambda \right)<br>\\ &amp; =  \dfrac{ P \left( i_{t}=q_{i}, O | \lambda \right) } { P \left( O | \lambda \right) }<br>\\ &amp; = \dfrac{ P \left( i_{t}=q_{i}, O | \lambda \right) } { \sum_{j=1}^{N} \left( i_{t}=q_{i}, O | \lambda \right) }<br>\\ &amp; = \dfrac{ P \left( o_{1}^{t}, i_{t}=q_{i} \right) P \left( o_{t+1}^{T}| i_{t}=q_{i} \right) } { \sum_{j=1}^{N} P \left( o_{1}^{t}, i_{t}=q_{i} \right) P \left( o_{t+1}^{T}| i_{t}=q_{i} \right) }<br>\\ &amp; = \dfrac{ \alpha_{t} \left( i \right) \beta_{t} \left( i \right)} { \sum_{j=1}^{N}  \alpha_{t} \left( i \right) \beta_{t} \left( i \right) }\end{align}</p>
+<p>给定模型$\lambda$和观测$O$，在时刻$t$处于状态$q_{i}$且在时刻$t+1$处于状态$q_{j}$的概率<br>\begin{align} \\ &amp; \xi_{t} \left( i,j \right) = P \left( i_{t}=q_{i}, i_{t+1}=q_{j} | O ,\lambda \right)<br>\\ &amp; = \dfrac{ P \left( i_{t}=q_{i}, i_{t+1}=q_{j},O | \lambda \right) } { P \left( O | \lambda \right) }<br>\\ &amp; = \dfrac{ P \left( i_{t}=q_{i}, i_{t+1}=q_{j}, O | \lambda \right) } { \sum_{i=1}^{N} \sum_{j=1}^{N}  P \left( i_{t}=q_{i}, i_{t+1}=q_{j}, O|\lambda \right) }<br>\\ &amp; = \dfrac{ \alpha_{t} \left( i \right) a_{ij} b_{j} \left( o_{t+1} \right) \beta_{t+1} \left( j \right) } { \sum_{i=1}^{N} \sum_{j=1}^{N}  \alpha_{t} \left( i \right) a_{ij} b_{j} \left( o_{t+1} \right) \beta_{t+1} \left( j \right)}\end{align}</p>
+<p>在观测$O$下状态$i$出现的期望\begin{align} &amp; \sum_{t=1}^{T} \gamma_{t} \left( i \right) =  \sum_{t=1}^{T} P \left( i_{t}=q_{i} | O, \lambda \right) \end{align}</p>
+<p>在观测$O$下由状态$i$转移的期望\begin{align} &amp; \sum_{t=1}^{T－1} \gamma_{t} \left( i \right) =  \sum_{t=1}^{T－1} P \left( i_{t}=q_{i} | O, \lambda \right) \end{align}</p>
+<p>在观测$O$下由状态$i$转移到状态$j$的期望\begin{align} &amp; \sum_{t=1}^{T－1} \xi_{t} \left( i,j \right) =  \sum_{t=1}^{T－1} P \left( i_{t}=q_{i}, i_{t+1}=q_{j} | O, \lambda \right) \end{align}</p>
+<h2 id="3-学习算法"><a href="#3-学习算法" class="headerlink" title="3 学习算法"></a>3 学习算法</h2><p>将观测序列作为观测数据$O$,将状态序列作为隐数据$I$，则隐马尔科夫模型是含有隐变量的概率模型<br> \begin{align} &amp; P \left( O | \lambda \right) = \sum_{I} P \left( O | I, \lambda \right) P \left( I | \lambda \right)\end{align}  </p>
+<p>完全数据<br> \begin{align} &amp; \left( O, I \right) = \left(o_{1}, o_{2}, \cdots, o_{T}, i_{1}, i_{2}, \cdots, o_{T} \right)\end{align}  </p>
+<p>完全数据的对数似然函数<br>\begin{align} &amp; \log P \left( O, I | \lambda \right) \end{align}  </p>
+<p>$Q \left( \lambda, \overline{\lambda} \right)$函数<br>\begin{align} \\&amp; Q \left( \lambda, \overline{\lambda} \right) = E_{I} \left[ \log P \left( O, I | \lambda \right) | O, \overline{\lambda} \right]<br>\\ &amp; = \sum_{I} \log P \left( O, I | \lambda \right) P \left( I | O, \overline{\lambda} \right)<br>\\ &amp; = \sum_{I} \log \dfrac{P \left( O, I | \lambda \right) P \left( O, I | \overline{\lambda} \right) }{P \left( O | \overline{\lambda} \right)}\end{align}<br>其中，$\overline{\lambda}$是隐马尔科夫模型参数的当前估计值，$\lambda$是隐马尔科夫模型参数。</p>
+<p>由于对最大化$Q \left( \lambda, \overline{\lambda} \right)$函数，$P \left( O | \overline{\lambda} \right)$为常数因子，<br>以及\begin{align} &amp; P \left( O, I | \lambda \right) = \pi_{i_{1}} b_{i_{1}} \left( o_{1} \right) a_{i_{1}i_{2}} b_{i_{2}} \left( o_{2} \right) \cdots a_{i_{T-1}i_{T}}b_{T}\left( o_{T} \right)\end{align}<br>所以求$Q \left( \lambda, \overline{\lambda} \right)$函数对$\lambda$的最大\begin{align} &amp; \lambda = \arg \max{Q \left( \lambda, \overline{\lambda} \right) }\Leftrightarrow \arg\max \sum_{I} \log P \left( O, I | \lambda \right) P \left( O, I | \overline{\lambda} \right)<br>\\ &amp;  = \sum_{I} \log \pi_{i_{1}} P \left( O, I | \overline{\lambda} \right) + \sum_{I} \left( \sum_{t=1}^{T-1} \log a_{i_{t}i_{t+1}} \right) P \left( O, I | \overline{\lambda} \right) + \sum_{I} \left( \sum_{t=1}^{T} \log b_{i_{t}} \left( o_{t} \right) \right) P \left( O, I | \overline{\lambda} \right)\end{align}    </p>
+<p>对三项分别进行极大化：  </p>
+<ol>
+<li>\begin{align} &amp; \max \sum_{I} \log \pi_{i_{1}} P \left( O, I | \overline{\lambda} \right) = \sum_{i=1}^{N} \log \pi_{i_{1}} P \left( O, i_{1}=i | \overline{\lambda} \right)<br>\\ &amp; s.t. \sum_{i=1}^{N} \pi_{i} = 1 \end{align}<br>构造拉格朗日函数，对其求偏导，令结果为0 \begin{align} &amp; \dfrac{\partial}{\partial \pi_{i}} \left[ \sum_{i=1}^{N} \log \pi_{i_{1}} P \left( O, i_{1}=i | \overline{\lambda} \right) + \gamma \left( \sum_{i=1}^{N} \pi_{i} - 1 \right) \right] = 0\end{align}<br>得\begin{align} &amp; P \left( O, i_{1} = i | \overline{\lambda} \right) + \gamma \pi_{i} = 0<br>\\ &amp; \sum_{i=1}^{N} \left[ P \left( O, i_{1} = i | \overline{\lambda} \right) + \gamma \pi_{i} \right] = 0<br>\\ &amp; \sum_{i=1}^{N} P \left( O, i_{1} = i | \overline{\lambda} \right) + \gamma \sum_{i=1}^{N} \pi_{i}  = 0<br>\\ &amp; P \left( O | \overline{\lambda} \right) + \gamma  = 0<br>\\ &amp; \gamma  = - P \left( O | \overline{\lambda} \right)\end{align}<br>代入$P \left( O, i_{1} = i | \overline{\lambda} \right) + \gamma \pi_{i} = 0$，得<br>\begin{align} &amp; \pi_{i} = \dfrac{P \left( O, i_{1} = i | \overline{\lambda} \right)}{P \left( O | \overline{\lambda} \right)}<br>\\ &amp; = \gamma_{1} \left( i \right) \end{align}    </li>
+<li>\begin{align} \\ &amp; \max \sum_{I} \left( \sum_{t=1}^{T-1} \log a_{i_{t}i_{t+1}} \right) P \left( O, I | \overline{\lambda} \right) = \sum_{i=1}^{N} \sum_{j=1}^{N} \sum_{t=1}^{T-1} \log a_{ij} P \left( O, i_{t}=i, i_{t+1}=j | \overline{\lambda} \right)<br>\\ &amp; s.t. \sum_{j=1}^{N} a_{ij} = 1 \end{align}<br>得\begin{align} \\ &amp; a_{ij} = \dfrac{\sum_{t=1}^{T-1} P \left( O, i_{t}=i, i_{t+1}=j | \overline{\lambda} \right)}{\sum_{t=1}^{T-1} P \left( O, i_{t}=i | \overline{\lambda} \right)}<br>\\ &amp; = \dfrac{\sum_{t=1}^{T-1} \xi_{t} \left( i,j \right) }{\sum_{t=1}^{T-1} \gamma_{t} \left( i \right)}\end{align}   </li>
+<li>\begin{align} \\ &amp; \max \sum_{I} \left( \sum_{t=1}^{N} \log b_{i_{t}} \left( o_{t} \right) \right) P \left( O, I | \overline{\lambda} \right) = \sum_{j=1}^{N} \sum_{t=1}^{T} \log b_{j} \left( o_{t} \right) P \left( O, i_{t}=j | \overline{\lambda} \right)<br>\\ &amp; s.t. \sum_{k=1}^{M} b_{j} \left( k \right) = 1 \end{align}<br>得\begin{align} \\ &amp; b_{j} \left( k \right) = \dfrac{\sum_{t=1}^{T} P \left( O, i_{t}=j | \overline{\lambda} \right) I \left( o_{t} = v_{k} \right)}{\sum_{t=1}^{T} P \left( O, i_{t}=j | \overline{\lambda} \right)}<br>\\ &amp; = \dfrac{ \sum_{t=1,o_{t}=v_{k}}^{T} \gamma_{t} \left( j \right)}{\sum_{t=1}^{T} \gamma_{t} \left( j \right)}\end{align}</li>
+</ol>
+<p>Baum-Welch算法：<br>输入：观测数据$O = \left( o_{1}, o_{2}, \cdots, o_{T} \right)$<br>输出：隐马尔科夫模型参数  </p>
+<ol>
+<li>初始化<br>对$n=0$，选取$a_{ij}^{ \left( 0 \right) },b_{j} \left( k \right)^{\left( 0 \right)},\pi_{i}^{\left( 0 \right)}$，得到模型$\lambda^{\left( 0 \right)} = \left( a_{ij}^{ \left( 0 \right) },b_{j} \left( k \right)^{\left( 0 \right)},\pi_{i}^{\left( 0 \right)} \right)$  </li>
+<li>递推<br>对$n=1,2, \cdots,$<br>\begin{align} \\ &amp; a_{ij}^{\left( n+1 \right)} = \dfrac{\sum_{t=1}^{T-1} \xi_{t} \left( i,j \right) }{\sum_{t=1}^{T-1} \gamma_{t} \left( i \right)}<br>\\ &amp; b_{j} \left( k \right)^{\left( n+1 \right)} = \dfrac{ \sum_{t=1,o_{t}=v_{k}}^{T} \gamma_{t} \left( j \right)}{\sum_{t=1}^{T} \gamma_{t} \left( j \right)}<br>\\ &amp; \pi_{i}^{\left( n+1 \right)} = \dfrac{P \left( O, i_{1} = i | \overline{\lambda} \right)}{P \left( O | \overline{\lambda} \right)} \end{align}<br>其中，右端各值按观测数据$O = \left( o_{1}, o_{2}, \cdots, o_{T} \right)$和模型$\lambda^{\left( n \right)} = \left( A^{\left( n \right)},B^{\left( n \right)},\pi^{\left( n \right)} \right)$计算。  </li>
+<li>终止<br>得到模型$\lambda^{\left( n＋1 \right)} = \left( A^{\left( n+1 \right)},B^{\left( n+1 \right)},\pi^{\left( n+1 \right)} \right)$</li>
+</ol>
+<h2 id="4-预测算法"><a href="#4-预测算法" class="headerlink" title="4 预测算法"></a>4 预测算法</h2><p>在时刻$t$状态为$i$的所有单个路径$\left( i_{1}, i_{2}, \cdots, i_{t} \right)$中概率最大值<br>\begin{align} \\ &amp; \delta_{t} \left( i \right) = \max_{i_{1}, i_{2}, \cdots, i_{t-1}} P \left(i_{t}=i, i_{t-1}, \cdots, i_{1}, o_{t}, \cdots, o_{1} | \lambda \right) \quad \quad \quad i = 1, 2, \cdots, N  \end{align}</p>
+<p>得递推公式\begin{align} \\ &amp; \delta_{t+1} \left( i \right) = \max_{i_{1}, i_{2}, \cdots, i_{t}} P \left(i_{t+1}=i, i_{t}, \cdots, i_{1}, o_{t+1}, \cdots, o_{1} | \lambda \right)<br>\\ &amp; = \max_{1 \leq j \leq N} \left[ \max_{i_{1}, i_{2}, \cdots, i_{t-1}} P \left( i_{t+1}=i, i_{t}=j, i_{t-1}, \cdots, i_{1}, o_{t+1}, o_{t}, \cdots, o_{1} | \lambda \right) \right]<br>\\ &amp; = \max_{1 \leq j \leq N} \left[ \max_{i_{1}, i_{2}, \cdots, i_{t-1}} P \left( i_{t+1}=i, i_{t}=j, i_{t-1}, \cdots, i_{1}, o_{t}, o_{t-1}, \cdots, o_{1} | \lambda \right) P \left( o_{t+1} | i_{t+1}=i, \lambda \right)\right]<br>\\ &amp; = \max_{1 \leq j \leq N} \left[ \max_{i_{1}, i_{2}, \cdots, i_{t-1}} P \left( i_{t}=j, i_{t-1}, \cdots, i_{1}, o_{t}, o_{t-1}, \cdots, o_{1} | \lambda \right) P \left( i_{t+1}=i | i_{t}=j, \lambda \right)P \left( o_{t+1} | i_{t+1}=i, \lambda \right)\right]<br>\\ &amp; =  \max_{1 \leq j \leq N} \left[ \delta_{t} \left( j \right) a_{ji}\right] b_{i} \left( o_{t+1} \right)\quad \quad \quad i = 1, 2, \cdots, N  \end{align}</p>
+<p>在时刻$t$状态为$i$的所有单个路径$\left( i_{1}, i_{2}, \cdots, i_{t} \right)$中概率最大值的路径的第$t-1$个结点<br>\begin{align} \\ &amp; \psi_{t} \left( i \right) = \arg \max_{1 \leq j \leq N} \left[ \delta_{t-1} \left( j \right) a_{ji} \right] \quad \quad \quad i = 1, 2, \cdots, N \end{align}</p>
+<p>维特比算法：<br>输入：模型$\lambda = \left( A, B, \pi \right)$和观测数据$O = \left( o_{1}, o_{2}, \cdots, o_{T} \right)$<br>输出：最优路径$I^{<em>} = \left( i_{1}^{</em>}, i_{2}^{<em>}, \cdots, i_{T}^{</em>} \right)$  </p>
+<ol>
+<li>初始化<br>\begin{align} \\ &amp; \delta_{1} \left( i \right) = \pi_{i} b_{i} \left( o_{1} \right) \quad \quad \quad i = 1, 2, \cdots, N<br>\\ &amp; \psi_{1} \left( i \right) = 0  \end{align}  </li>
+<li>递推<br>对$t=2,3, \cdots, T$<br>\begin{align} \\ &amp; \delta_{t} \left( i \right) = \max_{1 \leq j \leq N} \left[ \delta_{t-1} \left( j \right) a_{ji}\right] b_{i} \left( o_{t} \right)\quad \quad \quad i = 1, 2, \cdots, N<br>\\ &amp; \psi_{t} \left( i \right) = \arg \max_{1 \leq j \leq N} \left[ \delta_{t-1} \left( j \right) a_{ji} \right] \quad \quad \quad i = 1, 2, \cdots, N  \end{align}  </li>
+<li>终止<script type="math/tex; mode=display">\begin{align}
+& P^* = \max_{1 \leq j \leq N} \delta_{T} \left( i \right) \\
+& i_{T}^{*} = \arg \max_{1 \leq j \leq N} \left[ \delta_{T} \left( i \right) \right] 
+\end{align}</script></li>
+<li>最优路径回溯<br>对$t=T-1,T-2, \cdots, 1$ <script type="math/tex; mode=display">\begin{align}  
+& i_{t}^{*} = \psi_{t+1} \left( i_{t+1}^{*} \right) 
+\end{align}</script>求得最优路径<script type="math/tex; mode=display">I^* = \left( i_{1}^*, i_{2}^{*}, \cdots, i_{T}^* \right)</script></li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Machine-Learning/">Machine Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/CRF/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">CRF</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/LDA/">
+                        <span class="hidden-mobile">LDA</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "HMM&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

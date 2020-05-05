@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>Feedforward_Nerual_Network - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="前馈神经网络（Feedforward-Neural-Network，FNN）"><a href="#前馈神经网络（Feedforward-Neural-Network，FNN）" class="headerlink" title="前馈神经网络（Feedforward Neural Network，FNN）"></a>前馈神经网络（Feedforward Neural Network，FNN）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-前馈神经网络结构及前向传播"><a href="#1-前馈神经网络结构及前向传播" class="headerlink" title="1 前馈神经网络结构及前向传播"></a>1 前馈神经网络结构及前向传播</h2><p>训练数据集<br>\begin{align} \\&amp; T = \left\{ \left( \mathbf{x}_{1}, y_{1} \right), \left( \mathbf{x}_{2}, y_{2} \right), \cdots, \left(\mathbf{x}_i,y_i\right),\cdots,\left( \mathbf{x}_{N}, y_{N} \right) \right\} \end{align}<br>其中，$\mathbf{x}_{i}$为第$i$个特征向量（实例），$\mathbf{x}_{i}=\left( x^{\left(1\right)}_i,x^{\left(2\right)}_i,\ldots ,x^{\left(j\right)}_i,\ldots ,x^{\left(n\right)}_i\right) ^{T} \in \mathcal{X} \subseteq \mathbb{R}^{n}$；$y_{i}$为$\mathbf{x}_{i}$的类别标记，类别标记表示为类别位置为1，其余位置为0的类别向量（one-hot编码）,$\mathbf{y}_i\in\{0,1\}^m$。</p>
+<p>前馈神经网络输入层（层 1）  \begin{align} &amp; \mathbf{a}^{1}=\left( a_{1}^{1},a_{2}^{1},\ldots ,a_{j}^{1},\ldots ,a_{n}^{1}\right) ^{T}\\ &amp; a_{j}^{1}=x^{\left(j\right)}_i\quad\left( j=1,2,\ldots ,n\right) \end{align}</p>
+<p>前馈神经网络隐藏层（层 2） \begin{align} &amp; \mathbf{a}^{2}=\left( a_{1}^{2},a_{2}^{2},\ldots ,a_{j}^{2},\ldots  ,a_{p}^{2}\right) ^{T}\\ &amp; a_{j}^{2}=\sigma \left( z_{j}^{2}\right) \\ &amp; z_{j}^{2}= \sum _{k}w_{jk}^{2}\cdot a_{k}^{1}+b_{j}^{2}\quad\left( j=1,2,\ldots ,p\right) \\&amp; \mathbf{z}^{2}=\left( z_{1}^{2},z_{2}^{2},\ldots ,z_{j}^{2},\ldots ,z_{p}^{2}\right) ^{T}\end{align}</p>
+<p>前馈神经网络输出层（层 3） \begin{align} &amp; \mathbf{a}^{3}=\left( a_{1}^{3},a_{2}^{3},\ldots ,a_{j}^{3},\ldots,a_{m}^{3}\right) ^{T}\\ &amp; a_{j}^{3}=\sigma \left( z_{j}^{3}\right) \\ &amp; z_{j}^{3}= \sum _{k}w_{jk}^{3}\cdot a_{k}^{2}+b_{j}^{3}\quad\left( j=1,2,\ldots ,m\right) \\&amp; \mathbf{z}^{3}=\left( z_{1}^{3},z_{2}^{3},\ldots ,z_{j}^{3},\ldots ,z_{m}^{3}\right) ^{T}\end{align}</p>
+<p>预测输出 \begin{align} &amp; \hat{\mathbf{y}}=\left( \hat y_{1},\hat y_{2},\ldots ,\hat y_{j},\ldots ,\hat y_{m}\right) ^{T}\\ &amp; \hat y_{j}=a_{j}^{3}\quad\left( j=1,2,\ldots ,m\right)\end{align}  </p>
+<p>实际输出 \begin{align} &amp; \mathbf{y}=\left( y_{1},y_{2},\ldots ,y_{j},\ldots ,y_{m}\right) ^{T}  \quad\left( j=1,2,\ldots ,m\right) \end{align} </p>
+<p>其中，$\sigma\left(\cdot\right)$为激活函数。</p>
+<h2 id="2-参数学习"><a href="#2-参数学习" class="headerlink" title="2 参数学习"></a>2 参数学习</h2><p>单个实例$\mathbf{x}$的损失函数$C_{\mathbf{x}}\left(\mathbf{y},\hat{\mathbf{y}}\right)$为平方损失函数、</p>
+<script type="math/tex; mode=display">\begin{align} & C_{\mathbf{x}}=\dfrac {1} {2}\left\| \mathbf{y}-\hat {\mathbf{y}}\right\| ^{2}=\dfrac {1} {2}\sum _{j}\left( y_{j}-\hat {y}_{j}\right) ^{2} \end{align}</script><p>目标函数（经验风险）  \begin{align} &amp; C=\dfrac {1} {N}\sum _{\mathbf{x}}C_{\mathbf{x}} \end{align} </p>
+<p>第$l$层参数$w_{jk}^l$更新为  </p>
+<script type="math/tex; mode=display">\begin{align}
+w_{jk}^l & \leftarrow w_{jk}^l-\alpha \dfrac {\partial C} {\partial w_{jk}^{l}}  \\
+&=w_{jk}^l-\alpha\frac{1}{N}\sum_{\mathbf{x}}\dfrac {\partial C_x} {\partial w_{jk}^{l}}
+\end{align}</script><p>第$l$层参数$b_j^l$更新为    </p>
+<script type="math/tex; mode=display">\begin{align}
+b_j^l & \leftarrow b_j^l-\alpha \dfrac {\partial C} {\partial b_j^{l}}  \\
+&=b_j^l-\alpha\frac{1}{N}\sum_{\mathbf{x}}\dfrac {\partial C_x} {\partial b_j^{l}}
+\end{align}</script><h2 id="3-误差反向传播"><a href="#3-误差反向传播" class="headerlink" title="3 误差反向传播"></a>3 误差反向传播</h2><p>定义第$l$层的第$j$个神经元上的误差 \begin{align} &amp; \delta _{j}^{l}\equiv \dfrac {\partial C_{\mathbf{x}}} {\partial z_{j}^{l}} \quad\left( l=2,3\right)\end{align} </p>
+<p>输出层误差 </p>
+<script type="math/tex; mode=display">\begin{align} \delta _{j}^{3}&=\dfrac {\partial C_{\mathbf{x}}} {\partial z_{j}^{3}} \\ 
+& =\dfrac {\partial C_{\mathbf{x}}} {\partial a_{j}^{3}}\cdot\dfrac {\partial a_{j}^{3}} {\partial z_{j}^{3}} \\ & =\dfrac {\partial \left(\frac{1}{2}\sum_{j=1}^m \left(y_j-\hat{y}_j\right)^2\right)} {\partial \hat{y}_j}\cdot \sigma '\left( z_{j}^{3}\right) \\
+& = \left(\hat{y}_j-y_j\right) \cdot \sigma'\left( z_{j}^{3} \right)\quad\left( j=1,2,\ldots ,m\right)\end{align}</script><p>隐藏层误差</p>
+<script type="math/tex; mode=display">\begin{align} \delta _{j}^{2}&=\dfrac {\partial C_{\mathbf{x}}} {\partial z_{j}^{2}}\\ 
+& =\sum _{k}\dfrac {\partial C_{\mathbf{x}}} {\partial z_{k}^{3}}\cdot \dfrac {\partial z_{k}^{3}} {\partial z_{j}^{2}} \\ 
+& = \sum _{k} \dfrac {\partial z_{k}^{3}} {\partial z_{j}^{2}}\cdot\delta _{k}^{3}\\ 
+& = \sum _{k} \dfrac {\partial \left( \sum _{j}w_{kj}^{3}\cdot a_{j}^{2}+b_{k}^{3}\right)} {\partial z_{j}^{2}}\cdot\delta _{k}^{3}\\ 
+& = \sum _{k} \dfrac {\partial \left( \sum _{j}w_{kj}^{3}\cdot  \sigma \left( z_{j}^{2}\right)+b_{k}^{3}\right)} {\partial z_{j}^{2}}\cdot\delta _{k}^{3}\\ 
+& = \sum _{k} w_{kj}^{3}\cdot \sigma '\left( z_{j}^{2}\right) \cdot\delta _{k}^{3} \\ 
+& = \sigma '\left( z_{j}^{2}\right) \cdot\sum _{k} w_{kj}^{3} \delta _{k}^{3} \quad\left( j=1,2,\ldots ,p\right)\quad\left( k=1,2,\ldots ,m\right)
+\end{align}</script><h2 id="4-梯度下降算法"><a href="#4-梯度下降算法" class="headerlink" title="4 梯度下降算法"></a>4 梯度下降算法</h2><p>损失函数在隐藏层（层2）／输出层（层3）关于偏置的梯度 \begin{align} &amp; \dfrac {\partial C_{\mathbf{x}}} {\partial b_{j}^{l}}=\dfrac {\partial C_{\mathbf{x}}} {\partial z_{j}^{l}}\cdot \dfrac {\partial z_{j}^{l}} {\partial b_{j}^{l}}=\delta _{j}^{l}\cdot \dfrac {\partial \left( \sum _{k}w_{jk}^{l}a_{k}^{l-1}+b_{j}^{l}\right) } {\partial b_{j}^{l}}=\delta _{j}^{l}\quad\left( l=2,3\right)\end{align} </p>
+<p>损失函数在隐藏层（层2）／输出层（层3）关于权值的梯度\begin{align} &amp; \dfrac {\partial C_{\mathbf{x}}} {\partial w_{jk}^{l}}=\dfrac {\partial C_{\mathbf{x}}} {\partial z_{j}^{l}}\cdot \dfrac {\partial z_{j}^{l}} {\partial w_{jk}^{l}}=\delta _{j}^{l}\cdot \dfrac {\partial \left( \sum _{k}w_{jk}^{l}a_{k}^{l-1}+b_{j}^{l}\right) } {\partial w_{jk}^{l}}=\delta _{j}^{l}\cdot a_{k}^{l-1}\quad\left( l=2,3\right)\end{align} </p>
+<p>算法4.1 偏置与权值的梯度计算算法<br>输入：实例$\mathbf{x}=\left(x^{\left(1\right)},\cdots,x^{\left(n\right)}\right)^\top$<br>输出：损失函数在隐藏层（层2）／输出层（层3）关于偏置及权值的梯度$\left(\dfrac {\partial C_{\mathbf{x}}} {\partial b_{j}^{l}}\right)$和$\left(\dfrac {\partial C_{\mathbf{x}}} {\partial w_{jk}^{l}}\right)$   </p>
+<ol>
+<li>为输入层设置对应的激活值$\left(a_j^1\right)_{j=1}^n=\left(x^{\left(j\right)}\right)_{j=1}^n$ </li>
+<li>前向传播：对每个$l（l=2,3）$计算\begin{align} &amp;a_{j}^{l}=\sigma \left( z_{j}^{l}\right) \\ &amp; z_{j}^{l}= \sum _{k}w_{jk}^{l}\cdot a_{k}^{l-1}+b_{j}^{l}\end{align}  </li>
+<li>计算输出层误差$\left(\delta _{j}^{3}\right)_{j=1}^m$；  </li>
+<li>计算误差反向传播：隐藏层误差$\left(\delta _{j}^{2}\right)_{j=1}^p$；  </li>
+<li>计算损失函数在隐藏层（层2）／输出层（层3）关于偏置及权值的梯度$\left(\dfrac {\partial C_{\mathbf{x}}} {\partial b_{j}^{l}}\right)$和$\left(\dfrac {\partial C_{\mathbf{x}}} {\partial w_{jk}^{l}}\right)$。</li>
+</ol>
+<p>算法4.2 梯度下降算法：<br>输入：训练实例集合$T$<br>输出：偏置和权值的更新</p>
+<ol>
+<li>对每个训练实例$\mathbf{x}$：设置对应的输入激活$\mathbf{a}^{\mathbf{x},1}$，并执行以下步骤：<ul>
+<li>前向传播：计算$\mathbf{z}^{\mathbf{x},l}=\mathbf{W}^l\mathbf{a}^{\mathbf{x},l-1}+\mathbf{b}^l$及$\mathbf{a}^{\mathbf{x},l}=\sigma\left(\mathbf{z}^{\mathbf{x},l}\right)$，其中$l=2,3,\cdots,L$。</li>
+<li>输出层误差：$\delta^{\mathbf{x},L}=\nabla_{\mathbf{a}^L}C_\mathbf{x}\odot\sigma’\left(\mathbf{z}^{\mathbf{x},L}\right)$</li>
+<li>误差反向传播：对每个$l=L-1,L-2,\cdots,2$，计算$\delta^{\mathbf{x},l}=\left(\left(\mathbf{W}^{l+1}\right)^\top\delta^{\mathbf{x},l+1}\right)\odot\sigma’\left(\mathbf{z}^{\mathbf{x},l}\right)$。</li>
+</ul>
+</li>
+<li>梯度下降：对每个$l=L-1,L-2,\cdots,2$，根据$\mathbf{W}^l\leftarrow\mathbf{W}^l-\frac{\eta}{N}\sum_\mathbf{x}\delta^{\mathbf{x},l}\left(\mathbf{a}^{\mathbf{x},l-1}\right)^\top$和$\mathbf{b}^l\leftarrow\mathbf{b}^l-\frac{\eta}{N}\sum_\mathbf{x}\delta^{\mathbf{x},l}$更新权重和偏置。</li>
+</ol>
+<h2 id="5-前馈神经网络的改进"><a href="#5-前馈神经网络的改进" class="headerlink" title="5 前馈神经网络的改进"></a>5 前馈神经网络的改进</h2><h3 id="交叉熵损失函数"><a href="#交叉熵损失函数" class="headerlink" title="交叉熵损失函数"></a>交叉熵损失函数</h3><p>单个实例$\mathbf{x}$的损失函数$C_{\mathbf{x}}$为交叉熵损失函数</p>
+<script type="math/tex; mode=display">C_{\mathbf{x}}=-\sum _{j}\left[y_j\log\hat{y}_j+\left(1-y_j\right)\log\left(1-\hat{y}_j\right)\right]</script><h3 id="正则化目标函数"><a href="#正则化目标函数" class="headerlink" title="正则化目标函数"></a>正则化目标函数</h3><p>$L_2$正则化的目标函数（结构风险） </p>
+<script type="math/tex; mode=display">C=\frac{1}{N}\left(\sum _{\mathbf{x}}C_{\mathbf{x}}+ \frac{\lambda}{2}\sum_w w^2\right)</script><h3 id="权值初始化"><a href="#权值初始化" class="headerlink" title="权值初始化"></a>权值初始化</h3><p>权值初始化<br>设对$l$层有有$n_{in}^l$个输入神经元，使用均值为$0$，标准差为$\frac{1}{\sqrt{n_{in}^l}}$的高斯分布初始化$l$层的权值</p>
+<script type="math/tex; mode=display">w^l\sim N\left(0,\frac{1}{n_{in}^l}\right)</script><h3 id="早停止"><a href="#早停止" class="headerlink" title="早停止"></a>早停止</h3><p>当验证集上的错误率不再下降时，就停止迭代。停止迭代需要根据实际任务上进行优化。</p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nerual-network/">nerual network</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/Nerual-Probabilistic-Language-Model/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">Nerual_Probabilistic_Language_Model</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/Recurrent-Nerual-Network/">
+                        <span class="hidden-mobile">Recurrent_Nerual_Network</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Feedforward_Nerual_Network&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

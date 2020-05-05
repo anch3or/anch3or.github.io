@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>Nerual_Probabilistic_Language_Model - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="A-Neural-Probabilistic-Language-Model"><a href="#A-Neural-Probabilistic-Language-Model" class="headerlink" title="A Neural Probabilistic Language Model"></a>A Neural Probabilistic Language Model</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-统计语言模型与n-gram模型"><a href="#1-统计语言模型与n-gram模型" class="headerlink" title="1 统计语言模型与n-gram模型"></a>1 统计语言模型与n-gram模型</h2><p>统计语言模型可描述为给定前序词序列后，下一单词出现的条件概率的乘积：</p>
+<script type="math/tex; mode=display">\hat P\left(w_1^T\right)=\prod_{t=1}^T\hat P\left(w_t|w_1^{t-1}\right)</script><p>其中，$w_t$是第$t$个单词，$w_i^j=\left(w_i,w_{i+1},\dots,w_{j-1},w_j\right)$是从第$i$个单词到第$j$个单词的子序列。</p>
+<p>n-gram模型可描述为给定前$n-1$个单词后，第$n$个单词出现的条件概率：</p>
+<script type="math/tex; mode=display">\hat P\left(w_t|w_1^{t-1}\right)\approx P\left(w_t|w_{t-n+1}^{t-1}\right)</script><h2 id="2-神经网络语言模型"><a href="#2-神经网络语言模型" class="headerlink" title="2 神经网络语言模型"></a>2 神经网络语言模型</h2><p><img src="https://i.loli.net/2020/05/05/Zud3VClSxYbsK49.png" srcset="/img/loading.gif"  align=center  width = "450" height = "350" /></p>
+<p>训练集$w_1,w_2,\dots,w_T$是单词序列。单词表$V$是由单词组成的规模很大但是有限的集合，$w_t\in V$，$|V|$是单词表$V$中单词个数。</p>
+<p>学习的目标</p>
+<script type="math/tex; mode=display">f\left(w_t,w_{t-1},\dots,w_{t-n+2},w_{t-n+1}\right)=\hat P\left(w_t|w_1^{t-1}\right)</script><p>需要满足的约束条件：</p>
+<ul>
+<li>$f\left(w_t,w_{t-1},\dots,w_{t-n+2},w_{t-n+1}\right)&gt;0$</li>
+<li>$\sum_{i=1}^{|V|}f\left(i,w_{t-1},\dots,w_{t-n+2},w_{t-n+1}\right)=1$</li>
+</ul>
+<p>将函数$f\left(w_t,w_{t-1},\dots,w_{t-n+2},w_{t-n+1}\right)=\hat P\left(w_t|w_1^{t-1}\right)$分解为两部分：</p>
+<ol>
+<li>从单词表$V$中任意元素$i$到实向量$C\left(i\right)\in\mathbb{R}^m$的映射$C$。映射$C$表示单词表中每个单词的分布式特征向量。在实践中，映射$C$表示为一个$|V|\times m$的自由参数矩阵；</li>
+<li>使用映射$C$表达的每个单词的概率函数$g$。概率函数$g$是从输入词序列的单词上下文特征向量$\left(C\left(w_{t-n+1}\right),\dots,C\left(w_{t-1}\right)\right)$，到下一单词$w_t$的条件概率分布的映射。概率函数$g$的输出是一个向量，向量中第$i$个元素是概率$\hat P\left(w_t=i|w_1^{t-1}\right)$<script type="math/tex; mode=display">f\left(i,w_{t-1},\dots,w_{t-n+1}\right)=g\left(i, C\left(w_{t-1}\right),\dots,C\left(w_{t-n+1}\right)\right)</script></li>
+</ol>
+<p>函数$f$是两个映射$C$和$g$的组合。这两个映射都与各自的参数关联。映射$C$的参数是特征向量本身，被表示为一个$|V|\times m$的矩阵，矩阵的第$i$行是单词$i$的特征向量。函数$g$可以被一个基于参数集$\omega$的前馈神经网络或者卷积神经网络实现或其他参数化函数实现。则整体参数集合是$\theta=\left(C,\omega\right)$。</p>
+<p>训练是通过寻找能够使最大化语料库的带罚项对数似然的$\theta$实现的:</p>
+<script type="math/tex; mode=display">L\left(\theta\right)=\frac{1}{T}\sum_t\log f\left(w_t,w_{t-1},\dots,w_{t-n+1};\theta\right)+R\left(\theta\right)  \\  
+\theta^*=\mathop{\arg\max}_\theta L\left(\theta\right)</script><p>其中，$R\left(\theta\right)$是正则化项，是权重的惩罚。</p>
+<p>神经网络在单词特征映射之后有一个隐藏层，并且可以选择将单词特征直接连接到输出层。因此，实际上有两个隐藏层，共享的单词特征映射层$C$和普通的双曲正切隐藏层。神经网络输出层采用$softmax$输出层，</p>
+<script type="math/tex; mode=display">\hat P\left(w_t|w_{t-1},\dots,w_{t-n+1}\right)=\frac{e^{y_{w_t}}}{\sum_i e^{y_i}}</script><p>其中，$y_i$是每个输出单词$i$的未归一化的$\log$概率。</p>
+<p>使用参数$b,W,U,d,H$计算每个输出单词$i$的未归一化的$\log$概率</p>
+<script type="math/tex; mode=display">y=b+Wx+U\tanh\left(d+Hx\right)</script><p>其中，$x$是单词特征层激活向量，由矩阵C中的输入单词特征串联组成</p>
+<script type="math/tex; mode=display">x=\left(C\left(w_{t-1}\right),C\left(w_{t-2}\right),\dots,C\left(w_{t-n+1}\right)\right)</script><p>令$h$为隐藏单元个数，$m$为每个单词的特征维数。当没有从单词特征到输出的直接连接时，矩阵$W$设置为$\mathbf{0}$。模型自由参数包括:输出偏置向量$b\in\mathbb{R}^{|V|}$，隐藏层偏置向量$d\in\mathbb{R}^h$，隐藏层到输出层权值矩阵$U\in\mathbb{R}^{|V|\times h}$，单词特征输出权值矩阵$W\in\mathbb{R}^{|V|\times\left(n-1\right)\cdot m}$，隐藏层权值矩阵$H\in\mathbb{R}^{h\times\left(n-1\right)\cdot m}$，单词特征矩阵$C\in\mathbb{R}^{|V|\times m}$</p>
+<script type="math/tex; mode=display">\theta=\left(b,d,W,U,H,C\right)</script><p>自由参数共有$h\left(1+\left(n-1\right)m\right)+|V|\left(1+nm+h\right)$个。</p>
+<p>神经网络上的随机梯度提升是指在训练语料库的第$t$个单词后进行以下迭代更新</p>
+<script type="math/tex; mode=display">\theta=\theta+\varepsilon\frac{\partial\log\hat{P}\left(w_t|w_{t-1},\dots,w_{t-n+1}\right)}{\partial\theta}</script><p>其中，$\varepsilon$是学习率。</p>
+<p>第$i$个处理器，第$t$个样本的计算：</p>
+<ol>
+<li><p>前向计算<br>（a）单词特征层执行前向计算：</p>
+<script type="math/tex; mode=display">x\left(k\right)\leftarrow C\left(w_{t-k}\right),k=1,2,\dots,n-1  \\
+x=\left(x\left(1\right),x\left(2\right),\dots,x\left(n-1\right)\right)</script><p>（b）隐藏层执行前向计算：</p>
+<script type="math/tex; mode=display">o\leftarrow d+Hx \\
+a\leftarrow\tanh\left(o\right)</script><p>（c）在第$i$个块内的输出结点执行前向计算：</p>
+<script type="math/tex; mode=display">s_i\leftarrow 0</script><p>$\quad\qquad在第i个块中使用下标j进行循环$</p>
+<script type="math/tex; mode=display">y_j\leftarrow b_j+aU_j</script><p>$\quad\qquad如果有直接连接，y_j\leftarrow y_j+xW_j$</p>
+<script type="math/tex; mode=display">p_j\leftarrow e^{y_j}  \\
+s_i\leftarrow s_i+p_j</script><p>（d）在所有处理器中计算并分享$S=\sum_i s_i$<br>（e）概率规范化<br>$\quad\qquad在第i个块中使用下标j进行循环$</p>
+<script type="math/tex; mode=display">p_j\leftarrow p_j/S</script><p>（f）更新$\log$似然函数。</p>
+</li>
+<li><p>后向计算与参数更新（学习率$\varepsilon$）<br>（a）第$i$个块内的输出结点进行后向梯度计算：<br>$\quad\qquad清空梯度向量\frac{\partial L}{\partial a}和\frac{\partial L}{\partial x}$<br>$\quad\qquad在第i个块中使用下标j进行循环$</p>
+<script type="math/tex; mode=display">\frac{\partial L}{\partial y_j}\leftarrow 1_{j==w_t}-p_j  \\
+b_j\leftarrow b_j+\varepsilon\frac{\partial L}{\partial y_j}</script><p>$\quad\qquad如果有直接连接，\frac{\partial L}{\partial x}\leftarrow\frac{\partial L}{\partial x}+\frac{\partial L}{\partial y_j}W_j$</p>
+<script type="math/tex; mode=display">\frac{\partial L}{\partial a}\leftarrow\frac{\partial L}{\partial a}+\frac{\partial L}{\partial y_j}U_j</script><p>$\quad\qquad如果有直接连接，W_j\leftarrow W_j+\varepsilon\frac{\partial L}{\partial y_j}x$</p>
+<script type="math/tex; mode=display">U_j\leftarrow U_j+\varepsilon\frac{\partial L}{\partial y_j}a</script><p>（b）在所有处理器中计算并分享$\frac{\partial L}{\partial x}$和$\frac{\partial L}{\partial a}$<br>（c）后向传播并更新隐藏层权值：<br>$\quad\qquad在1和h之间使用下标k进行循环$  </p>
+<script type="math/tex; mode=display">\frac{\partial L}{\partial o_k}\leftarrow\left(1-a_k^2\right)\frac{\partial L}{\partial a_k}</script><script type="math/tex; mode=display">\frac{\partial L}{\partial x}\leftarrow\frac{\partial L}{\partial x}+H\frac{\partial L}{\partial o}  \\
+d\leftarrow d+\varepsilon\frac{\partial L}{\partial o}  \\
+H\leftarrow H+\varepsilon\frac{\partial L}{\partial o}x</script><p>（d）更新单词特征向量：<br>$\quad\qquad在1和n-1之间使用下标k进行循环$</p>
+<script type="math/tex; mode=display">C\left(w_{t-k}\right)\leftarrow C\left(w_{t-k}\right)+\varepsilon\frac{\partial L}{\partial x\left(k\right)}</script><p>$\quad\qquad其中，\frac{\partial L}{\partial x\left(k\right)}是\frac{\partial L}{\partial x}的第k个分量$。</p>
+</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                      <a class="hover-with-bg" href="/tags/language-model/">language model</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/Transfer-Learning/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">Transfer_Learning</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/Feedforward-Nerual-Network/">
+                        <span class="hidden-mobile">Feedforward_Nerual_Network</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Nerual_Probabilistic_Language_Model&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

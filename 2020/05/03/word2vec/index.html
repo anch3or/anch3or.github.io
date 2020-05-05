@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>word2vec - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="word2vec"><a href="#word2vec" class="headerlink" title="word2vec"></a>word2vec</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><p><img src="https://i.loli.net/2020/05/03/iDAS7JfsQGxFrUO.png" srcset="/img/loading.gif"  align=center  width = "300" height = "200" /></p>
+<h2 id="1-连续词袋模型（CBOW）与跳字模型（Skip-gram）"><a href="#1-连续词袋模型（CBOW）与跳字模型（Skip-gram）" class="headerlink" title="1 连续词袋模型（CBOW）与跳字模型（Skip-gram）"></a>1 连续词袋模型（CBOW）与跳字模型（Skip-gram）</h2><p>单词$w$；<br>词典$\mathcal{D}=\{w_1,w_2,\dots,w_N\}$，由单词组成的集合；<br>语料库$\mathcal{C}$，由单词组成的文本序列；<br>单词$w_t$的上下文是语料库中由单词$w_t$的前$c$个单词和后$c$个单词组成的文本序列，$w_t$称为中心词。</p>
+<script type="math/tex; mode=display">Context\left(w_t\right)=\left(w_{t-c},\cdots,w_{t-2},w_{t-1},w_{t+1},w_{t+2},\cdots,w_{t+c}\right)</script><p><img src="https://i.loli.net/2020/05/04/DcTPmFWsXBCeiOo.png" srcset="/img/loading.gif"  align=center  width = "450" height = "300" /></p>
+<p>连续词袋模型（CBOW, Continuous Bag-of-Words Model）假设中心词由该词在文本序列中的上下文来生成。<br>跳字模型（Skip-gram）假设中心词生成该词在文本序列中的上下文。</p>
+<h2 id="2-基于层序softmax（Hierarchical-softmax）方法的连续词袋模型训练"><a href="#2-基于层序softmax（Hierarchical-softmax）方法的连续词袋模型训练" class="headerlink" title="2 基于层序softmax（Hierarchical softmax）方法的连续词袋模型训练"></a>2 基于层序softmax（Hierarchical softmax）方法的连续词袋模型训练</h2><p>基于层序softmax方法的连续词袋模型网络结构：<br>输入层：$\mathbf{v}\left(Context\left(w\right)_1\right),\mathbf{v}\left(Context\left(w\right)_2\right),\cdots,\mathbf{v}\left(Context\left(w\right)_{2c}\right)\in\mathbb{R}^m$，其中$\mathbf{v}\left(\cdot\right)$为单词的向量化表示；<br>投影层：$\mathbf{x}_w=\sum_{i=1}^{2c}\mathbf{v}\left(Context\left(w\right)_i\right)\in\mathbb{R}^m$；<br>输出层：$T_{Huff}\left(\mathbf{x}_w\right)=s_{q\left(\mathbf{x}_w\right)},s\in\mathbb{R}^N,q:\mathbb{R}^m\to\{1,2,\cdots,N\}$，其中$N$为哈夫曼树叶子结点个数。</p>
+<p><img src="https://i.loli.net/2020/05/04/dC3aNnprhKwEDQP.png" srcset="/img/loading.gif"  align=center  width = "450" height = "350" /></p>
+<p>记<script type="math/tex">p^w=\left(p_1^w,p_2^w\cdots,p_{l^w}^w\right)</script>为从根节点出发到达$w$对应的叶子结点的路径。其中，$l^w$为路径长度，即路径中结点数目；$p_i^w$为路径中的结点，$p_1^w$为根结点，$p_{l^w}^w$为$w$对应的叶子结点。</p>
+<p>记</p>
+<script type="math/tex; mode=display">d^w=\left(d_2^w,d_3^w\cdots,d_{l^w}^w\right)</script><p>为$w$的Huffman编码。其中，$d_i^w\in\{0,1\}$为路径$p^w$中第$i$个结点对应的编码（根结点不对应编码）。</p>
+<p>记</p>
+<script type="math/tex; mode=display">\theta^w=\left(\theta_1^w,\theta_2^w,\cdots,\theta_{l^w-1}^w\right)</script><p>为路径$p^w$中非叶子结点对应的参数向量。其中，$\theta_i^w\in\mathbb{R}^m$为路径$p^w$中第$i$个非叶子结点对应的参数向量。</p>
+<p>条件概率</p>
+<script type="math/tex; mode=display">p\left(w|Context\left(w\right)\right)=\prod_{j=2}^{l^w}p\left(d_j^w|\mathbf{x}_w,\theta_{j-1}^w\right)</script><p>其中</p>
+<script type="math/tex; mode=display">p\left(d_j^w|\mathbf{x}_w,\theta_{j-1}^w\right)=\begin{equation} \left\{ \begin{array}{lr} \sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right),d^w_j =0; \\ 1-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right),d^w_j=1, & \end{array} \right. \end{equation}</script><p>或者</p>
+<script type="math/tex; mode=display">p\left(d_j^w|\mathbf{x}_w,\theta_{j-1}^w\right)=\left[\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]^{1-d_j^w}\cdot\left[1-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]^{d_j^w}</script><p>似然函数</p>
+<script type="math/tex; mode=display">\begin{align}
+\ell&=\prod_{w\in\mathcal{C}}p\left(w|Context\left(w\right)\right)\\
+&=\prod_{w\in\mathcal{C}}\prod_{j=2}^{l^w}p\left(d_j^w|\mathbf{x}_w,\theta_{j-1}^w\right)
+\end{align}</script><p>对数似然函数</p>
+<script type="math/tex; mode=display">\begin{align}\mathcal{L} &= \log\prod_{w\in\mathcal{C}}\prod_{j=2}^{l^w}p\left(d_j^w|\mathbf{x}_w,\theta_{j-1}^w\right) \\
+&=\sum_{w\in\mathcal{C}}\log \prod_{j=2}^{l^w} p\left(d_j^w|\mathbf{x}_w,\theta_{j-1}^w\right) \\
+&=\sum_{w\in\mathcal{C}}\sum_{j=2}^{l^w}\left\{\left(1-d_j^w\right)\cdot\log\left[\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]+d_j^w\cdot\log\left[1-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]\right\}
+\end{align}</script><p>对数似然函数$\mathcal{L}$关于$\theta_{j-1}^w$的偏导</p>
+<script type="math/tex; mode=display">\begin{align}\frac{\partial\mathcal{L}}{\partial\theta_{j-1}^w}&= \frac{\partial}{\partial\theta_{j-1}^w}\left\{\sum_{w\in\mathcal{C}}\sum_{j=2}^{l^w}\left\{\left(1-d_j^w\right)\cdot\log\left[\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]+d_j^w\cdot\log\left[1-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]\right\}\right\} \\
+&=\left(1-d_j^w\right)\left[1-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]\mathbf{x}_w-d_j^w\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\mathbf{x}_w   \\
+&=\left[1-d_j^w-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]\mathbf{x}_w\end{align}</script><p>$\theta_{j-1}^w$的更新</p>
+<script type="math/tex; mode=display">\theta_{j-1}^w=\theta_{j-1}^w+\eta\left[1-d_j^w-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]\mathbf{x}_w</script><p>其中，$\eta$为学习率。</p>
+<p>对数似然函数$\mathcal{L}$关于$\mathbf{x}_w$的偏导</p>
+<script type="math/tex; mode=display">\frac{\partial\mathcal{L}}{\partial\mathbf{x}_w}=\sum_{j=2}^{l^w}\left[1-d_j^w-\sigma\left(\mathbf{x}^\top_w\theta^w_{j-1}\right)\right]\theta_{j-1}^w</script><p>$\mathbf{v}\left(\tilde{w}\right)$的更新</p>
+<script type="math/tex; mode=display">\mathbf{v}\left(\tilde{w}\right)=\mathbf{v}\left(\tilde{w}\right)+\eta\frac{\partial\mathcal{L}}{\partial\mathbf{x}_w}</script><p>其中，$\tilde{w}\in Context\left(w\right)$。</p>
+<h2 id="3-基于层序softmax（Hierarchical-softmax）方法的跳字模型训练"><a href="#3-基于层序softmax（Hierarchical-softmax）方法的跳字模型训练" class="headerlink" title="3 基于层序softmax（Hierarchical softmax）方法的跳字模型训练"></a>3 基于层序softmax（Hierarchical softmax）方法的跳字模型训练</h2><p>基于层序softmax方法的跳字模型网络结构：<br>输入层：$\mathbf{v}\left(w\right)\in\mathbb{R}^m$<br>输出层：$T_{Huff}\left(\mathbf{v}_w\right)=s_{q\left(\mathbf{v}_w\right)},s\in\mathbb{R}^N,q:\mathbb{R}^m\to\{1,2,\cdots,N\}$</p>
+<p>条件概率</p>
+<script type="math/tex; mode=display">p\left(Context\left(w\right)|w\right)=\prod_{u\in Context\left(w\right)}p\left(u|w\right)</script><p>其中</p>
+<script type="math/tex; mode=display">p\left(u|w\right)=\prod_{j=2}^{l^u}p\left(d_j^u|\mathbf{v}\left(w\right),\theta_{j-1}^u\right)</script><p>且</p>
+<script type="math/tex; mode=display">p\left(d_j^u|\mathbf{v}\left(w\right),\theta_{j-1}^u\right)=\left[\sigma\left(\mathbf{v}\left(w\right)^\top\theta^u_{j-1}\right)\right]^{1-d_j^u}\cdot\left[1-\sigma\left(\mathbf{v}\left(w\right)^\top\theta^u_{j-1}\right)\right]^{d_j^u}</script><p>似然函数</p>
+<script type="math/tex; mode=display">\begin{align}
+\ell&=\prod_{w\in\mathcal{C}} p\left(Context\left(w\right)|w\right)\\
+&=\prod_{w\in\mathcal{C}}\prod_{u\in Context\left(w\right)}\prod_{j=2}^{l^u}p\left(d_j^u|\mathbf{v}\left(w\right),\theta_{j-1}^u\right)
+\end{align}</script><p>对数似然函数</p>
+<script type="math/tex; mode=display">\begin{align}\mathcal{L}&=\sum_{w\in\mathcal{C}}log\prod_{u\in Context\left(w\right)}\prod_{j=2}^{l^u}\left\{\left[\sigma\left(\mathbf{v}\left(w\right)^\top\theta^u_{j-1}\right)\right]^{1-d_j^u}\cdot\left[1-\sigma\left(\mathbf{v}\left(w\right)^\top\theta^u_{j-1}\right)\right]^{d_j^u}\right\}  \\
+&=\sum_{w\in\mathcal{C}}\sum_{u\in Context\left(w\right)}\sum_{j=2}^{l^u}\left\{\left(1-d_j^u\right)\cdot\log\left[\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]+d_j^u\cdot\log\left[1-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\right\}\end{align}</script><p>对数似然函数$\mathcal{L}$关于$\theta_{j-1}^u$的偏导</p>
+<script type="math/tex; mode=display">\begin{align}\frac{\partial\mathcal{L}}{\partial\theta_{j-1}^u} &= \frac{\partial}{\theta_{j-1}^u}\left\{\sum_{w\in\mathcal{C}}\sum_{u\in Context\left(w\right)}\sum_{j=2}^{l^u}\left\{\left(1-d_j^u\right)\cdot\log\left[\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]+d_j^u\cdot\log\left[1-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\right\}\right\}\\
+&=\sum_{w\in\mathcal{C}}\left\{\left(1-d_j^u\right)\left[1-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\mathbf{v}\left(w\right)-d_j^u\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\mathbf{v}\left(w\right)\right\} \\
+&=\sum_{w\in\mathcal{C}}\left[1-d_j^u-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\mathbf{v}\left(w\right)\end{align}</script><p>$\theta_{j-1}^u$的更新</p>
+<script type="math/tex; mode=display">\theta_{j-1}^u=\theta_{j-1}^u+\eta\sum_{w\in\mathcal{C}}\left[1-d_j^u-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\mathbf{v}\left(w\right)</script><p>其中，$\eta$为学习率。</p>
+<p>对数似然函数$\mathcal{L}$关于$\mathbf{v}\left(w\right)$的偏导</p>
+<script type="math/tex; mode=display">\frac{\partial\mathcal{L}}{\partial\mathbf{v}\left(w\right)}=\sum_{u\in Context\left(w\right)}\sum_{j=2}^{l^u}\left[1-d_j^u-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\theta_{j-1}^u</script><p>$\mathbf{v}\left(w\right)$的跟新</p>
+<script type="math/tex; mode=display">\mathbf{v}\left(w\right)=\mathbf{v}\left(w\right)+\eta\sum_{u\in Context\left(w\right)}\sum_{j=2}^{l^u}\left[1-d_j^u-\sigma\left(\mathbf{v}\left(w\right)^\top\theta_{j-1}^u\right)\right]\theta_{j-1}^u</script><h2 id="4-基于负采样（Negative-Sampling）方法的连续词袋模型训练"><a href="#4-基于负采样（Negative-Sampling）方法的连续词袋模型训练" class="headerlink" title="4 基于负采样（Negative Sampling）方法的连续词袋模型训练"></a>4 基于负采样（Negative Sampling）方法的连续词袋模型训练</h2><p>设$Context\left(w\right)$的负样本子集为</p>
+<script type="math/tex; mode=display">NEG\left(w\right)\neq\emptyset</script><p>对于$\forall\tilde{w}\in\mathcal{D}$，定义</p>
+<script type="math/tex; mode=display">\begin{equation} L^w\left(\tilde{w}\right)=\left\{ \begin{array}{lr} 1,\tilde{w}=w & \\ 0,\tilde{w}\neq w \end{array} \right. \end{equation}</script><p>表示词$\tilde{w}$的标签，正样本标签为$1$，负样本标签为$0$。</p>
+<p>关于字典$\mathcal{D}$的子集$\{w\}\bigcup NEG\left(w\right)$的似然函数</p>
+<script type="math/tex; mode=display">g\left(w\right)=\prod_{u\in\{w\}\bigcup NEG\left(w\right)} p\left(u|Context\left(w\right)\right)=\sigma\left(\mathbf{x}_w^\top\theta^w\right)\prod_{u\in NEG\left(w\right)}\left[1-\sigma\left(\mathbf{x}_w^\top\theta^w\right)\right]</script><p>其中</p>
+<script type="math/tex; mode=display">\begin{equation} p\left(u|Context\left(w\right)\right)=\left\{ \begin{array}{lr} \sigma\left(\mathbf{x}_w^\top\theta^u\right),L^w\left(u\right)=1 & \\ 1-\sigma\left(\mathbf{x}_w^\top\theta^u\right),L^w\left(u\right)=0 \end{array} \right. \end{equation}</script><p>或者</p>
+<script type="math/tex; mode=display">p\left(u|Context\left(w\right)\right)=\left[\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]^{L^w\left(u\right)}\cdot\left[1-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]^{1-L^w\left(u\right)}</script><p>$\mathbf{x}_w$为$Context\left(w\right)$词向量之和，$\theta^u\in\mathbb{R}^m$为模型参数。</p>
+<p>关于语料库$\mathcal{C}$的对数似然函数</p>
+<script type="math/tex; mode=display">\begin{align}\mathcal{L}& =\log\prod_{w\in\mathcal{C}}g\left(w\right)=\sum_{w\in\mathcal{C}}\log g\left(w\right)  \\
+&=\sum_{w\in\mathcal{C}}\log\prod_{u\in\{w\}\bigcup NEG\left(w\right)}\left\{\left[\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]^{L^w\left(u\right)}\cdot\left[1-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]^{1-L^w\left(u\right)}\right\} \\
+&=\sum_{w\in\mathcal{C}}\sum_{u\in\{w\}\bigcup NEG\left(w\right)}\left\{L^w\left(u\right)\cdot\log\left[\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]+\left[1-L^w\left(u\right)\right]\cdot\log\left[1-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]\right\}\end{align}</script><p>对数似然函数$\mathcal{L}$关于$\theta^u$的偏导</p>
+<script type="math/tex; mode=display">\begin{align}\frac{\partial\mathcal{L}}{\partial\theta^u}&=\frac{\partial}{\partial\theta^u}\left\{\sum_{w\in\mathcal{C}}\sum_{u\in\{w\}\bigcup NEG\left(w\right)}\left\{L^w\left(u\right)\cdot\log\left[\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]+\left[1-L^w\left(u\right)\right]\cdot\log\left[1-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]\right\}\right\}\\
+&=L^w\left(u\right)\left[1-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]\mathbf{x}_w-\left[1-L^w\left(u\right)\right]\sigma\left(\mathbf{x}_w^\top\theta^u\right)\mathbf{x}_w \\
+&=\left[L^w\left(u\right)-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]\mathbf{x}_w\end{align}</script><p>$\theta^u$的更新</p>
+<script type="math/tex; mode=display">\theta^u=\theta^u+\eta\left[L^w\left(u\right)-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]\mathbf{x}_w</script><p>对数似然函数$\mathcal{L}$关于$\mathbf{x}_w$的偏导</p>
+<script type="math/tex; mode=display">\frac{\partial\mathcal{L}}{\partial\mathbf{x}_w}=\sum_{u\in\left(w\right)\bigcup NEG\left(w\right)}\left[L^w\left(u\right)-\sigma\left(\mathbf{x}_w^\top\theta^u\right)\right]\theta^u</script><p>$\mathbf{v}\left(\tilde{w}\right)$的更新</p>
+<script type="math/tex; mode=display">\mathbf{v}\left(\tilde{w}\right)=\mathbf{v}\left(\tilde{w}\right)+\eta\frac{\partial\mathcal{L}}{\partial\mathbf{x}_w}</script><p>其中，$\tilde{w}\in Context\left(w\right)$。</p>
+<h2 id="5-基于负采样（Negative-Sampling）方法的跳字模型训练"><a href="#5-基于负采样（Negative-Sampling）方法的跳字模型训练" class="headerlink" title="5 基于负采样（Negative Sampling）方法的跳字模型训练"></a>5 基于负采样（Negative Sampling）方法的跳字模型训练</h2><p>关于字典$\mathcal{D}$的子集$\{w\}\bigcup NEG^{\tilde{w}}\left(w\right)$的似然函数</p>
+<script type="math/tex; mode=display">g\left(w\right)=\prod_{\tilde{w}\in Context\left(w\right)}\prod_{u\in\{w\}\bigcup NEG^{\tilde{w}}\left(w\right)} p\left(u|\tilde{w}\right)</script><p>其中</p>
+<script type="math/tex; mode=display">\begin{equation} p\left(u|\tilde{w}\right)=\left\{ \begin{array}{lr} \sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right),L^w\left(u\right)=1 & \\ 1-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right),L^w\left(u\right)=0 \end{array} \right. \end{equation}</script><p>或者</p>
+<script type="math/tex; mode=display">p\left(u|\tilde{w}\right)=\left[\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]^{L^w\left(u\right)}\cdot\left[1-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]^{1-L^w\left(u\right)}</script><p>$NEG^{\tilde{w}}\left(w\right)$为处理词$\tilde{w}$时生成的负样本子集。</p>
+<p>关于语料库$\mathcal{C}$的对数似然函数</p>
+<script type="math/tex; mode=display">\begin{align}\mathcal{L}& =\log\prod_{w\in\mathcal{C}}g\left(w\right)=\sum_{w\in\mathcal{C}}\log g\left(w\right)  \\
+&=\sum_{w\in\mathcal{C}}\log\prod_{\tilde{w}\in Context\left(w\right)}\prod_{u\in\{w\}\bigcup NEG^{\tilde{w}}\left(w\right)}\left\{\left[\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]^{L^w\left(u\right)}\cdot\left[1-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]^{1-L^w\left(u\right)}\right\} \\
+&=\sum_{w\in\mathcal{C}}\sum_{\tilde{w}\in Context\left(w\right)}\sum_{u\in\{w\}\bigcup NEG^{\tilde{w}}\left(w\right)}\left\{L^w\left(u\right)\cdot\log\left[\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]+\left[1-L^w\left(u\right)\right]\cdot\log\left[1-\sigma\left(\mathbf{v}\left(\tilde{w}\right)\top\theta^u\right)\right]\right\}\end{align}</script><p>对数似然函数$\mathcal{L}$关于$\theta^u$的偏导</p>
+<script type="math/tex; mode=display">\begin{align}\frac{\partial\mathcal{L}}{\partial\theta^u}&=\frac{\partial}{\partial\theta^u}\left\{\sum_{w\in\mathcal{C}}\sum_{\tilde{w}\in Context\left(w\right)}\sum_{u\in\{w\}\bigcup NEG\left(w\right)}\left\{L^w\left(u\right)\cdot\log\left[\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]+\left[1-L^w\left(u\right)\right]\cdot\log\left[1-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]\right\}\right\}\\
+&=L^w\left(u\right)\left[1-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]\mathbf{v}\left(\tilde{w}\right)-\left[1-L^w\left(u\right)\right]\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\mathbf{v}\left(\tilde{w}\right) \\
+&=\left[L^w\left(u\right)-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]\mathbf{v}\left(\tilde{w}\right)\end{align}</script><p>$\theta^u$的更新</p>
+<script type="math/tex; mode=display">\theta^u=\theta^u+\eta\left[L^w\left(u\right)-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]\mathbf{v}\left(\tilde{w}\right)</script><p>对数似然函数$\mathcal{L}$关于$\mathbf{v}\left(\tilde{w}\right)$的偏导</p>
+<script type="math/tex; mode=display">\frac{\partial\mathcal{L}}{\partial\mathbf{v}\left(\tilde{w}\right)}=\sum_{u\in\left(w\right)\bigcup NEG^{\tilde{w}}\left(w\right)}\left[L^w\left(u\right)-\sigma\left(\mathbf{v}\left(\tilde{w}\right)^\top\theta^u\right)\right]\theta^u</script><p>$\mathbf{v}\left(\tilde{w}\right)$的更新</p>
+<script type="math/tex; mode=display">\mathbf{v}\left(\tilde{w}\right)=\mathbf{v}\left(\tilde{w}\right)+\eta\frac{\partial\mathcal{L}}{\partial\mathbf{v}\left(\tilde{w}\right)}</script><h2 id="负采样算法"><a href="#负采样算法" class="headerlink" title="负采样算法"></a>负采样算法</h2><p><img src="https://i.loli.net/2020/05/04/PBpKFcatW5RZYqm.png" srcset="/img/loading.gif"  align=center  width = "550" height = "200" /></p>
+<p>设词典$\mathcal{D}$中词$w_i$对应线段$l\left(w_i\right)$，长度为</p>
+<script type="math/tex; mode=display">len\left(w_i\right)=\frac{counter\left(w_i\right)}{\sum_{u\in\mathcal{D}}counter\left(u\right)}</script><p>其中，$counter\left(\cdot\right)$为词在语料$\mathcal{C}$中的出现次数。可将线段$l\left(w_1\right)\cdots l\left(w_N\right)$拼接为长度为$1$的单位线段。</p>
+<p>记</p>
+<script type="math/tex; mode=display">\begin{align}l_0&=0 \\
+l_k&=\sum_{j=1}^k len\left(w_j\right),k=1,2,\cdots,N \end{align}</script><p>则以$\{l_j\}_{j=0}^N$为剖分点可得到区间$\left[0,1\right]$上的一个非等距剖分</p>
+<script type="math/tex; mode=display">I_i=(l_{i-1},l_i],i=1,2,\cdots,N</script><p>在区间$\left[0,1\right]$上以剖分点$\left\{m_j\right\}_{j=0}^M$做等距剖分，其中$M\gg N$。</p>
+<p>将等距剖分的内部点$\left\{m_j\right\}_{j=1}^{M-1}$投影到非等距剖分。则可建立$\left\{m_j\right\}_{j=1}^{M-1}$与区间$\left\{I_j\right\}_{j=1}^N$的映射，进一步建立与词$\left\{w_j\right\}_{j=1}^M$之间的映射</p>
+<script type="math/tex; mode=display">w_k=Table\left(i\right),m_i\in I_k,i=1,2,\cdots,M-1</script>
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/LSA/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">LSA</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/03/seq2seq-with-attention/">
+                        <span class="hidden-mobile">seq2seq_with_attention</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "word2vec&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

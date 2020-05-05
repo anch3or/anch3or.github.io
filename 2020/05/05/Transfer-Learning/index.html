@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>Transfer_Learning - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="迁移学习（Transfer-Learning）"><a href="#迁移学习（Transfer-Learning）" class="headerlink" title="迁移学习（Transfer Learning）"></a>迁移学习（Transfer Learning）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-迁移学习的形式化定义"><a href="#1-迁移学习的形式化定义" class="headerlink" title="1 迁移学习的形式化定义"></a>1 迁移学习的形式化定义</h2><p>领域$\mathcal{D}$：数据及数据的概率分布<br>源领域$\mathcal{D}_s=\{\left(\mathbf{x}_i,y_i\right)|P_s\left(\mathbf{x}_i\right)\}_{i=1}^n$<br>目标领域$\mathcal{D}_t=\{\mathbf{x}_j|P_t\left(\mathbf{x}_j\right)\}_{j=n+1}^{n+m}$</p>
+<p>迁移学习（Transfer Learning）：给定有标记源领域$\mathcal{D}_s=\{\left(\mathbf{x}_i,y_i\right)|P_s\left(\mathbf{x}_i\right)\}_{i=1}^n$和无标记目标领域$\mathcal{D}_t=\{\mathbf{x}_j|P_t\left(\mathbf{x}_j\right)\}_{j=n+1}^{n+m}$，其中$P_s\left(\mathbf{x}_i\right)\neq P_t\left(\mathbf{x}_j\right)$。迁移学习的目的是借助源领域$\mathcal{D}_s$的知识，来学习目标领域$\mathcal{D}_t$的知识（标签）。</p>
+<p>领域自适应（Domain Adaptation）：给定有标记源领域$\mathcal{D}_s=\{\left(\mathbf{x}_i,y_i\right)|P_s\left(\mathbf{x}_i\right)\}_{i=1}^n$和无标记目标领域$\mathcal{D}_t=\{\mathbf{x}_j|P_t\left(\mathbf{x}_j\right)\}_{j=n+1}^{n+m}$，<br>其中，$\mathbf{x}_i\in\mathcal{X}_s,\mathbf{x}_j\in\mathcal{X}_t$，且$\mathcal{X}_s=\mathcal{X}_t,P_s\left(\mathbf{x}_i\right)\neq P\left(\mathbf{x}_j\right)$；$y_i\in\mathcal{Y}_s,y_j\in\mathcal{Y}_t$，且$\mathcal{Y}_s=\mathcal{Y}_t,Q_s\left(y_i|\mathbf{x}_i\right)= Q\left(y_j|\mathbf{x}_j\right)$。<br>迁移学习的目的是，利用有标记源领域数据$\mathcal{D}_s$学习一个分类器$f:\mathbf{x}_s\to y_s$来预测目标领域数据$\mathcal{D}_t$的标签$y_t\in\mathcal{Y}_t$。</p>
+<p>度量是描述源领域$\mathcal{D}_s$和目标领域$\mathcal{D}_t$之间的距离。  </p>
+<script type="math/tex; mode=display">DISTANCE\left(\mathcal{D}_s,\mathcal{D}_t\right)=DistanceMeasure\left(\cdot,\cdot\right)</script><p>最大均值差异（Maximum mean discrepancy，MMD），度量再生希尔伯特空间中两个分布的距离，是一种核学习方法。</p>
+<script type="math/tex; mode=display">MMD^2\left(X,Y\right)=\bigg{\|}\sum_{i=1}^{n1}\phi\left(\mathbf{x}_i\right)-\sum_{j=1}^{n2}\phi\left(\mathbf{y}_j\right)\bigg{\|}_\mathcal{H}^2</script><p>其中，$\phi\left(\cdot\right)$是将数据映射到满足$\left<K\left(x,\cdot\right),K\left(\cdot,y\right)\right>_\mathcal{H}=K\left(x,y\right)$条件的希尔伯特空间的映射。</p>
+<h2 id="2-迁移学习方法"><a href="#2-迁移学习方法" class="headerlink" title="2 迁移学习方法"></a>2 迁移学习方法</h2><h3 id="边缘分布自适应"><a href="#边缘分布自适应" class="headerlink" title="边缘分布自适应"></a>边缘分布自适应</h3><p>边缘分布自适应的目标是减少源领域$\mathcal{D}_s$和目标领域$\mathcal{D}_t$之间的边缘概率分布的距离，从而完成迁移学习。<br>边缘分布自适应方法使用$P_s\left(\mathbf{x}\right)$和$P_t\left(\mathbf{x}\right)$之间的距离来近似两个领域之间的差异：  </p>
+<script type="math/tex; mode=display">DISTANCE\left(\mathcal{D}_s,\mathcal{D}_t\right)\approx\|P_s\left(\mathbf{x}\right)-P_t\left(\mathbf{x}\right)\|</script><p>迁移成分分析（Transfer Component Aualysis，TCA）<br>由于$P_s\left(\mathbf{x}\right)\neq P_t\left(\mathbf{x}\right)$，假设存在映射$\phi\left(\cdot\right)$，使得$P_s\left(\phi(\left(\mathbf{x}\right)\right)\approx P_t\left(\phi\left(\mathbf{x}\right)\right)$，则$P\left(y_s|\phi\left(\mathbf{x}_s\right)\right)\approx P\left(y_t|\phi\left(\mathbf{x}_t\right)\right)$。</p>
+<script type="math/tex; mode=display">\phi^*=\mathop{\arg\min}_{\phi} DISTANCE\left(\mathcal{D}_{s,\phi},\mathcal{D}_{t,\phi}\right)</script><p>迁移成分分析中，源领域与目标领域之间的距离度量</p>
+<script type="math/tex; mode=display">DISTANCD\left(\mathcal{D}_{s,\phi},\mathcal{D}_{t,\phi}\right)=\bigg{\|}\frac{1}{n_1}\sum_{i=1}^{n_1}\phi\left(\mathbf{x}_i\right)-\frac{1}{n_2}\sum_{j=1}^{n_2}\phi\left(\mathbf{x}_j\right)\bigg{\|}_\mathcal{H}</script><p>其中，$n_1,n_2$分别为源领域与目标领域的样本个数。</p>
+<p>引入核矩阵</p>
+<script type="math/tex; mode=display">K=\begin{bmatrix} K_{s,s} & K_{s,t} \\ K_{t,s} & K_{t,t} \end{bmatrix}</script><p>其中，$K_{\cdot,\cdot}=K\left(\mathbf{x}_\cdot,\mathbf{x}_\cdot\right)$<br>系数矩阵$L=\left(l_{ij}\right)$<br>其中，</p>
+<script type="math/tex; mode=display">
+l_{ij}=\left\{
+\begin{align}
+\frac{1}{n_1^2} & \quad \mathbf{x}_i,\mathbf{x}_j\in\mathcal{D}_s \\
+\frac{1}{n_2^2} & \quad \mathbf{x}_i,\mathbf{x}_j\in\mathcal{D}_t \\
+-\frac{1}{n_1 n_2} &  otherwise
+\end{align}
+\right.</script><p>则</p>
+<script type="math/tex; mode=display">K^*=\mathop{\arg\min}_K \mathop{tr}\left(KL\right)-\lambda\mathop{tr}\left(K\right)</script><p>其中，$\mathop{tr}\left(\cdot\right)$为矩阵的迹</p>
+<h3 id="条件分布自适应"><a href="#条件分布自适应" class="headerlink" title="条件分布自适应"></a>条件分布自适应</h3><p>条件分布自适应的目标是减少源领域$\mathcal{D}_s$和目标领域$\mathcal{D}_t$之间的条件概率分布的距离，从而完成迁移学习。<br>条件分布自适应方法使用$Q_s\left(y_s|\mathbf{x}_s\right)$和$Q_t\left(y_t|\mathbf{x}_t\right)$之间的距离来近似两个领域之间的差异：  </p>
+<script type="math/tex; mode=display">DISTANCE\left(\mathcal{D}_s,\mathcal{D}_t\right)\approx\|Q_s\left(y_s|\mathbf{x}_s\right)-Q_t\left(y_t|\mathbf{x}_t\right)\|</script><h3 id="联合分布自适应"><a href="#联合分布自适应" class="headerlink" title="联合分布自适应"></a>联合分布自适应</h3><p>联合分布自适应的目标是减少源领域$\mathcal{D}_s$和目标领域$\mathcal{D}_t$之间的联合概率分布的距离，从而完成迁移学习。<br>联合分布自适应方法使用$P_s\left(\mathbf{x}\right)$和$P_t\left(\mathbf{x}\right)$之间的距离以及$Q_s\left(y_s|\mathbf{x}_s\right)$和$Q_t\left(y_t|\mathbf{x}_t\right)$之间的距离来近似两个领域之间的差异：  </p>
+<script type="math/tex; mode=display">DISTANCE\left(\mathcal{D}_s,\mathcal{D}_t\right)\approx\left(1-\mu\right)\|P_s\left(\mathbf{x}\right)-P_t\left(\mathbf{x}\right)\|+\mu\|Q_s\left(y_s|\mathbf{x}_s\right)-Q_t\left(y_t|\mathbf{x}_t\right)\|</script><h2 id="3-深度迁移学习"><a href="#3-深度迁移学习" class="headerlink" title="3 深度迁移学习"></a>3 深度迁移学习</h2><p>损失函数</p>
+<script type="math/tex; mode=display">l=l_c\left(\mathcal{D}_s,y_s\right)+\lambda l_A\left(\mathcal{D}_s,\mathcal{D}_t\right)</script><p>其中，$l_c\left(\mathcal{D}_s,y_s\right)$为网络模型在源领域的损失，$l_A\left(\mathcal{D}_s,\mathcal{D}_t\right)$为网络模型的自适应损失。</p>
+<h3 id="深度领域混淆（Deep-Domain-Confusion，DDC）"><a href="#深度领域混淆（Deep-Domain-Confusion，DDC）" class="headerlink" title="深度领域混淆（Deep Domain Confusion，DDC）"></a>深度领域混淆（Deep Domain Confusion，DDC）</h3><p>损失函数</p>
+<script type="math/tex; mode=display">l=l_c\left(\mathcal{D}_s,y_s\right)+\lambda MMD^2\left(\mathcal{D}_s,\mathcal{D}_t\right)</script><p>其中，$MMD$为最大值均方差异。<br><img src="https://i.loli.net/2020/05/05/29luQad7riv3hwT.png" srcset="/img/loading.gif"  align=center  width = "400" height = "400" /></p>
+<h3 id="深度适应网络（Deep-Adaptation-Networks，DAN）"><a href="#深度适应网络（Deep-Adaptation-Networks，DAN）" class="headerlink" title="深度适应网络（Deep Adaptation Networks，DAN）"></a>深度适应网络（Deep Adaptation Networks，DAN）</h3><p>多核MMD</p>
+<script type="math/tex; mode=display">\mathcal{K}\triangleq\{k=\sum_{u=1}^m\beta_u k_u,\beta_u\geq 0\}</script><p>优化目标</p>
+<script type="math/tex; mode=display">\min_{\Theta}\frac{1}{n_a}J\left(\theta\left(\mathbf{x}_i^a\right),y_i^a\right)+\lambda\sum_{l=l_1}^{l_2}   d_k^2 \left(\mathcal{D}_s^l,\mathcal{D}_t^l \right)</script><p><img src="https://i.loli.net/2020/05/05/7xBRfp6giAz53EF.png" srcset="/img/loading.gif"  align=center  width = "600" height = "200" /></p>
+<h3 id="深度对抗网络迁移"><a href="#深度对抗网络迁移" class="headerlink" title="深度对抗网络迁移"></a>深度对抗网络迁移</h3><h4 id="生成对抗网络GAN"><a href="#生成对抗网络GAN" class="headerlink" title="生成对抗网络GAN"></a>生成对抗网络GAN</h4><p><img src="https://i.loli.net/2020/05/05/tXHW4NKBMneArUw.png" srcset="/img/loading.gif"  align=center  width = "500" height = "250" /></p>
+<p>目标函数：  </p>
+<script type="math/tex; mode=display">V\left(D,G\right)=\mathbb{E}_{\mathbf{x}\sim p_{data}\left(\mathbf{x}\right)}\left[\log D\left(\mathbf{x}\right)\right]+\mathbb{E}_{\mathbf{z}\sim p_\mathbf{z}\left(\mathbf{z}\right)}\left[\log\left(1-D\left(G\left(\mathbf{z}\right)\right)\right)\right]</script><p>其中，$\mathbf{x}$为服从分布$p_{data}\left(\mathbf{x}\right)$的样本数据，$\mathbf{z}$为服从先验分布$p_\mathbf{z}\left(\mathbf{z}\right)$的输入随机噪声变量，生成器$G\left(\cdot\right)$为多层感知机表示的输入随机噪声变量到数据空间的映射函数，$G\left(\mathbf{z}\right)\sim p_G$服从从样本数据$\mathbf{x}$学习到的分布$p_G$，判别器$D\left(\cdot\right)$为多层感知机表示的区分数据分布$p_{data}$还是生成器分布$p_G$的判别函数。</p>
+<p>优化问题：</p>
+<script type="math/tex; mode=display">\min_G \max_D V\left(D,G\right)</script><h4 id="领域对抗神经网络（Domain-Adversarial-Neural-Network，DANN）"><a href="#领域对抗神经网络（Domain-Adversarial-Neural-Network，DANN）" class="headerlink" title="领域对抗神经网络（Domain-Adversarial Neural Network，DANN）"></a>领域对抗神经网络（Domain-Adversarial Neural Network，DANN）</h4><p>生成器进行源领域与目标领域特征提取，使得判别器无法对两个领域的差异进行判别。</p>
+<p>领域对抗损失函数</p>
+<script type="math/tex; mode=display">
+l_d=\frac{1}{n} \sum_{i=1}^{n} \mathcal{L}_{d}^{i}(\mathbf{W}, \mathbf{b}, \mathbf{u}, z)+\frac{1}{n^{\prime}} \sum_{i=n+1}^{N} \mathcal{L}_{d}^{i}(\mathbf{W}, \mathbf{b}, \mathbf{u}, z)</script><p>其中$\mathcal{L}_d$表示为</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{d}\left(G_{d}\left(G_{f}\left(\mathbf{x}_{i}\right)\right), d_{i}\right)=d_{i} \log \frac{1}{G_{d}\left(G_{f}\left(\mathbf{x}_{i}\right)\right)}+\left(1-d_{i}\right) \log \frac{1}{1-G_{d}\left(G_{f}\left(\mathbf{x}_{i}\right)\right)}</script><h3 id="微调网络-finetune"><a href="#微调网络-finetune" class="headerlink" title="微调网络 finetune"></a>微调网络 finetune</h3><p><img src="https://i.loli.net/2020/05/05/GVsE7ubUQFoDR2T.png" srcset="/img/loading.gif"  align=center  width = "400" height = "400" /></p>
+<h2 id="4-参考文献"><a href="#4-参考文献" class="headerlink" title="4 参考文献"></a>4 参考文献</h2><p>Li, Y., Wang, N., Shi, J., Hou, X., and Liu, J. (2018). Adaptive batch normalization for practical domain adaptation. Pattern Recognition, 80:109–117.<br>Long, M., Cao, Y., Wang, J., and Jordan, M. (2015a). Learning transferable features with deep adaptation networks. In ICML, pages 97–105.<br>Tzeng, E., Hoffman, J., Darrell, T., and Saenko, K. (2015). Simultaneous deep transfer across domains and tasks. In Proceedings of the IEEE International Conference on Computer Vision, pages 4068–4076, Santiago, Chile. IEEE.<br>Tzeng, E., Hoffman, J., Saenko, K., and Darrell, T. (2017). Adversarial discriminative domain adaptation. In CVPR, pages 2962–2971.<br>Tzeng, E., Hoffman, J., Zhang, N., et al. (2014). Deep domain confusion: Maximizing for domain invariance. arXiv preprint arXiv:1412.3474.<br>Bousmalis, K., Trigeorgis, G., Silberman, N., Krishnan, D., and Erhan, D. (2016). Domain separation networks. In Advances in Neural Information Processing Systems, pages 343–351.<br>Shen, J., Qu, Y., Zhang, W., and Yu, Y. (2018). Wasserstein distance guided representation learning for domain adaptation. In AAAI.  </p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/domain-adaptation/">domain adaptation</a>
+                    
+                      <a class="hover-with-bg" href="/tags/finetune/">finetune</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/Generative-Adversarial-Networks/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">Generative_Adversarial_Networks</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/Nerual-Probabilistic-Language-Model/">
+                        <span class="hidden-mobile">Nerual_Probabilistic_Language_Model</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Transfer_Learning&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

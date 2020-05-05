@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>pLSA - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="概率潜在语义分析（Probabilistic-Latent-Semantic-Analysis-PLSA）"><a href="#概率潜在语义分析（Probabilistic-Latent-Semantic-Analysis-PLSA）" class="headerlink" title="概率潜在语义分析（Probabilistic Latent Semantic Analysis, PLSA）"></a>概率潜在语义分析（Probabilistic Latent Semantic Analysis, PLSA）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><p>单词集合$W=\{w_1,w_2,\cdots,w_M\}$<br>文本集合$D=\{d_1,d_2,\cdots,d_N\}$<br>话题集合$Z=\{z_1,z_2,\cdots,z_K\}$<br>单词-文本共现数据$T=\left[n\left(w_i,d_j\right)\right],i=1,2,\cdots,M;j=1,2,\cdots,N;$</p>
+<p>文本-单词共现数据的生成过程：</p>
+<ol>
+<li>依据概率分布$P\left(d\right)$，从文本集合中随机选取一个文本$d$，共生成$N$个文本；针对每个文本，执行以下操作；</li>
+<li>在文本$d$给定条件下，依据条件概率分布$P\left(z|d\right)$，从话题集合中随机选取一个话题$z$，共生成$L$个话题（$L$为文本长度）；</li>
+<li>在话题$z$给定条件下，依据条件概率分布$P\left(w|z\right)$，从单词集合中随机选取一个单词$w$。</li>
+</ol>
+<p>文本-单词共现数据$T$的生成概率</p>
+<script type="math/tex; mode=display">P\left(T\right)=\prod_{\left(w,d\right)} P\left(w,d\right)^{n\left(w,d\right)}</script><p>其中，$n\left(w,d\right)$表示$\left(w,d\right)$的出现次数，单词-文本对出现的总次数是$N\times L$。</p>
+<p>每个单词-文本对$\left(w,d\right)$的生成概率</p>
+<script type="math/tex; mode=display">
+\begin{align}
+P\left(w,d\right)&=P\left(d\right)P\left(w|d\right)  \\
+&=P\left(d\right)\sum_z P\left(w,z|d\right)          \\
+&=P\left(d\right)\sum_z P\left(z|d\right)P\left(w|z\right) 
+\end{align}</script><p>假设在话题$z$给定条件下，单词$w$与文本$d$条件独立</p>
+<script type="math/tex; mode=display">
+\begin{align}
+P\left(w,z|d\right)&=P\left(z|d\right)P\left(w|z,d\right) \\
+&=P\left(z|d\right)P\left(w|z\right) 
+\end{align}</script><p>单词-文本共现数据$T$的对数似然函数</p>
+<script type="math/tex; mode=display">\begin{align}
+L\left(T\right) &=\log\prod_{w,d}P\left(w,d\right)^{n\left(w,d\right)} \\
+&=\sum_{i=1}^M\sum_{j=1}^N n\left(w_i,d_j\right)\log P\left(w_i,d_j\right) \\
+&=\sum_{i=1}^M\sum_{j=1}^N n\left(w_i,d_j\right)\log \sum_{k=1}^K P\left(w_i,d_j,z_k\right) \\
+&=\sum_{i=1}^M\sum_{j=1}^N n\left(w_i,d_j\right)\log \sum_{k=1}^K P\left(w_i,z_k|d_j\right) P\left(d_j\right) \\
+&=\sum_{i=1}^M\sum_{j=1}^N n\left(w_i,d_j\right)\log \sum_{k=1}^K P\left(w_i|z_k\right) P\left(z_k|d_j\right) P\left(d_j\right) \\
+\end{align}</script><p>应用EM算法求解含有隐变量的对数似然函数优化问题。<br>E步：定义Q函数</p>
+<script type="math/tex; mode=display">\begin{align}
+Q &= \sum_z\log\prod_{w,d}P\left(w,d,z\right)^{n\left(w,d\right)}P\left(z|w,d\right) \\
+&= \sum_z\log\prod_{w,d}\left[P\left(w,z|d\right)P\left(d\right)\right]^{n\left(w,d\right)}P\left(z|w,d\right) \\
+&= \sum_z\left\{\sum_{w,d}n\left(w,d\right)\left[\log P\left(d\right)+\log P\left(w,z|d\right)\right]\right\}P\left(z|w,d\right) \\
+&= \sum_z\left\{\sum_d\left[\sum_w n\left(w,d\right)\log P\left(d\right)+\sum_w n\left(w,d\right)\log P\left(w|z,d\right)P\left(z|d\right)\right]\right\}P\left(z|w,d\right) \\
+&= \sum_z\left\{\sum_d\left[n\left(d\right)\log P\left(d\right)+\sum_w n\left(w,d\right)\log P\left(w|z\right)P\left(z|d\right)\right]\right\}P\left(z|w,d\right) \\
+&= \sum_z\left\{\sum_d n\left(d\right)\left[\log P\left(d\right)+\sum_w\frac{n\left(w,d\right)}{n\left(d\right)}\log P\left(w|z\right)P\left(z|d\right)\right]\right\}P\left(z|w,d\right) \\
+&= \sum_{k=1}^K\left\{\sum_{j=1}^N n\left(d_j\right)\left[\log P\left(d_j\right)+\sum_{i=1}^M\frac{n\left(w_i,d_j\right)}{n\left(d_j\right)}\log P\left(w_i|z_k\right)P\left(z_k|d_j\right)\right]\right\}P\left(z_k|w_i,d_j\right)
+\end{align}</script><p>其中，$n\left(w,d\right)$表示单词$w$在文本$d$中出现的次数，$n\left(d\right)=\sum_w\left(w,d\right)$表示文本$d$中单词的个数。</p>
+<p>由于可以从数据中直接统计得出$P\left(d_j\right)$的估计，可将$Q$函数简化为只考虑$P\left(w_i|z_k\right)$和$P\left(z_k|d_j\right)$的函数$Q^{‘}$</p>
+<script type="math/tex; mode=display">Q^{'}=\sum_{i=1}^M \sum_{j=1}^N n\left(w_i,d_j\right)\sum_{k=1}^K P\left(z_k|w_i,d_j\right)\log\left[P\left(w_i|z_k\right)P\left(z_k|d_j\right)\right]</script><p>$Q^{‘}$函数中$P\left(z_k|w_i,d_j\right)$根据贝叶斯公式</p>
+<script type="math/tex; mode=display">\begin{align}
+P\left(z_k|w_i,d_j\right)&=\frac{P\left(w_i,z_k|d_j\right)}{P\left(w_i|d_j\right)} \\
+&=\frac{P\left(w_i,z_k|d_j\right)}{\sum_{k=1}^K P\left(w_i,z_k|d_j\right)} \\
+&=\frac{P\left(w_i|z_k\right)P\left(z_k|d_j\right)}{\sum_{k=1}^K P\left(w_i|z_k\right)P\left(z_k|d_j\right)} 
+\end{align}</script><p>其中，$P\left(z_k|d_j\right)$和$P\left(w_i|z_k\right)$可由上一次迭代得到。</p>
+<p>M步：极大化Q函数</p>
+<script type="math/tex; mode=display">\begin{align}
+\max Q^{'} \\
+s.t.\quad \sum_{i=1}^M P\left(w_i|z_k\right)&=1,\quad k-1,2,\cdots,K \\
+\sum_{k=1}^K P\left(z_k|d_j\right)&=1,\quad j=1,2,\cdots,N
+\end{align}</script><p>定义拉格朗日函数</p>
+<script type="math/tex; mode=display">\Lambda=Q^{'}+\sum_{k=1}^K\tau_k\left(1-\sum_{i=1}^M P\left(w_i|z_k\right)\right)+\sum_{j=1}^N\rho_j\left(1-\sum_{k=1}^K P\left(z_k|d_j\right)\right)</script><p>拉格朗日函数$\Lambda$对$P\left(w_i|z_k\right)$求偏导，并令其等于0，得</p>
+<script type="math/tex; mode=display">\frac{\partial\Lambda}{\partial P\left(w_i|z_k\right)}=\sum_{j=1}^N n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)\frac{1}{P\left(w_i|z_k\right)}-\tau_k=0,\quad i=1,2,\cdots,M; \quad k=1,2,\cdots,K</script><script type="math/tex; mode=display">\begin{align}
+\tau_k P\left(w_i|z_k\right) &= \sum_{j=1}^N n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right) \\
+\sum_{m=1}^M \tau_k P\left(w_m|z_k\right) &= \sum_{m=1}^M \sum_{j=1}^N n\left(w_m,d_j\right)P\left(z_k|w_m,d_j\right) \\
+\tau_k &= \sum_{m=1}^M \sum_{j=1}^N n\left(w_m,d_j\right)P\left(z_k|w_m,d_j\right) 
+\end{align}</script><script type="math/tex; mode=display">P\left(w_i|z_k\right)=\frac{\sum_{j=1}^N n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)}{\sum_{m=1}^M \sum_{j=1}^N n\left(w_m,d_j\right)P\left(z_k|w_m,d_j\right) }</script><p>拉格朗日函数$\Lambda$对$P\left(z_k|d_j\right)$求偏导，并令其等于0，得</p>
+<script type="math/tex; mode=display">\frac{\partial\Lambda}{\partial P\left(z_k|d_j\right)}=\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)\frac{1}{P\left(z_k|d_j\right)}-\rho_j=0,\quad j=1,2,\cdots,N; \quad k=1,2,\cdots,K</script><script type="math/tex; mode=display">\begin{align}
+\rho_j P\left(z_k|d_j\right) &= \sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right) \\
+\sum_{k=1}^K\rho_j P\left(z_k|d_j\right) &= \sum_{k=1}^K\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right) \\
+\rho_j  &= \sum_{k=1}^K\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)
+\end{align}</script><script type="math/tex; mode=display">\begin{align}
+P\left(z_k|d_j\right)&=\frac{\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)}{\sum_{k=1}^K\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)} \\
+&= \frac{\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)}{n\left(d_j\right)}
+\end{align}</script><p>概率潜在语义模型参数估计的EM算法：<br>输入：设单词集合为$W=\{w_1,w_2,\cdots,w_M\}$，文本集合为$D=\{d_1,d_2,\cdots,d_N\}$，话题集合为$Z=\{z_1,z_2,\cdots,z_K\}$，共现数据$\{n\left(w_i,d_j\right)\},i=1,2,\cdots,M,j=1,2,\cdots,N$<br>输出：$P\left(w_i|z_k\right)$和$P\left(z_k|d_j\right)$</p>
+<ol>
+<li>设置参数$P\left(w_i|z_k\right)$和$P\left(z_k|d_j\right)$的初始值；</li>
+<li>迭代执行以下E步，M步，直到收敛为止<br>E步骤：<script type="math/tex; mode=display">\begin{align}
+P\left(z_k|w_i,d_j\right)=\frac{P\left(w_i|z_k\right)P\left(z_k|d_j\right)}{\sum_{k=1}^K P\left(w_i|z_k\right)P\left(z_k|d_j\right)} 
+\end{align}</script>M步骤： <script type="math/tex; mode=display">\begin{align}
+P\left(w_i|z_k\right)&=\frac{\sum_{j=1}^N n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)}{\sum_{m=1}^M \sum_{j=1}^N n\left(w_m,d_j\right)P\left(z_k|w_m,d_j\right) } \\
+P\left(z_k|d_j\right)&=\frac{\sum_{i=1}^M n\left(w_i,d_j\right)P\left(z_k|w_i,d_j\right)}{n\left(d_j\right)}
+\end{align}</script></li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Machine-Learning/">Machine Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nlp/">nlp</a>
+                    
+                      <a class="hover-with-bg" href="/tags/topic-model/">topic model</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/MCMC/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">MCMC</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/LSA/">
+                        <span class="hidden-mobile">LSA</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "pLSA&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>Generative_Adversarial_Networks - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="生成对抗网络（Generative-Adversarial-Networks）"><a href="#生成对抗网络（Generative-Adversarial-Networks）" class="headerlink" title="生成对抗网络（Generative Adversarial Networks）"></a>生成对抗网络（Generative Adversarial Networks）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-GAN生成对抗网络的原理及实现"><a href="#1-GAN生成对抗网络的原理及实现" class="headerlink" title="1. GAN生成对抗网络的原理及实现"></a>1. GAN生成对抗网络的原理及实现</h2><h3 id="模型结构及优化"><a href="#模型结构及优化" class="headerlink" title="模型结构及优化"></a>模型结构及优化</h3><p><img src="https://i.loli.net/2020/05/05/tXHW4NKBMneArUw.png" srcset="/img/loading.gif" style="zoom:120%;" /></p>
+<p>目标函数：</p>
+<script type="math/tex; mode=display">
+V\left(D,G\right)=\mathbb{E}_{\mathbf{x}\sim p_{data}\left(\mathbf{x}\right)}\left[\log D\left(\mathbf{x}\right)\right]+\mathbb{E}_{\mathbf{z}\sim p_\mathbf{z}\left(\mathbf{z}\right)}\left[\log\left(1-D\left(G\left(\mathbf{z}\right)\right)\right)\right]</script><p>其中，$\mathbf{x}$为服从分布$p_{data}\left(\mathbf{x}\right)$的样本数据，$\mathbf{z}$为服从先验分布$p_\mathbf{z}\left(\mathbf{z}\right)$的输入随机噪声变量，生成器$G\left(\cdot\right)$为多层感知机表示的输入随机噪声变量到数据空间的映射函数，$G\left(\mathbf{z}\right)\sim p_G$服从从样本数据$\mathbf{x}$学习到的分布$p_G$，判别器$D\left(\cdot\right)$为多层感知机表示的区分数据分布$p_{data}$还是生成器分布$p_G$的判别函数。</p>
+<p>优化问题：</p>
+<script type="math/tex; mode=display">
+\min_G \max_D V\left(D,G\right)</script><p>给定任意生成器$G$，判别器$D$的训练目标是最大化目标函数$V\left(G,D\right)$</p>
+<script type="math/tex; mode=display">
+\begin{aligned} V(G, D) &=\int_{\mathbf{x}} p_{data}(\mathbf{x}) \log (D(\mathbf{x})) d \mathbf{x}+\int_{\mathbf{z}} p_{\mathbf{z}}(\mathbf{z}) \log (1-D(G(\mathbf{z}))) d \mathbf{z} \\ &=\int_{\mathbf{x}} p_{data}(\mathbf{x}) \log (D(\mathbf{x}))+p_{G}(\mathbf{x}) \log (1-D(\mathbf{x})) d \mathbf{x} \end{aligned}</script><p>令</p>
+<script type="math/tex; mode=display">
+\begin{align}
+\frac{\partial}{\partial D\left(\mathbf{x}\right)}\int_{\mathbf{x}}\left(p_{data}(\mathbf{x}) \log (D(\mathbf{x}))+p_{G}(\mathbf{x}) \log (1-D(\mathbf{x}))\right)d \mathbf{x}=\frac{p_{data}\left(\mathbf{x}\right)}{D\left(\mathbf{x}\right)}-\frac{p_G\left(\mathbf{x}\right)}{1-D\left(\mathbf{x}\right)}=0
+\end{align}</script><p>得最优判别器</p>
+<script type="math/tex; mode=display">
+D^{*}_G\left(\mathbf{x}\right)=\frac{p_{data}\left(\mathbf{x}\right)}{p_{data}\left(\mathbf{x}\right)+p_G\left(\mathbf{x}\right)}</script><p>将最优判别器$D_G^{*}\left(\mathbf{x}\right)$代入，得目标函数</p>
+<script type="math/tex; mode=display">
+\begin{aligned} 
+C(G) &=\max _{D} V(G, D)=V\left(G,D_G^*\right) \\ 
+&=\mathbb{E}_{\mathbf{x} \sim p_{data }}\left[\log D_{G}^{*}(\mathbf{x})\right]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}}\left[\log \left(1-D_{G}^{*}(G(\mathbf{z}))\right)\right] \\ &=\mathbb{E}_{\mathbf{x} \sim p_{data}}\left[\log D_{G}^{*}(\mathbf{x})\right]+\mathbb{E}_{\mathbf{x} \sim p_{G}}\left[\log \left(1-D_{G}^{*}(\mathbf{x})\right)\right] \\ &=\mathbb{E}_{\mathbf{x} \sim p_{data }}\left[\log \frac{p_{data }(\mathbf{x})}{P_{data }(\mathbf{x})+p_{G}(\mathbf{x})}\right]+\mathbb{E}_{\mathbf{x} \sim p_{G}}\left[\log \frac{p_{G}(\mathbf{x})}{p_{data}(\mathbf{x})+p_{G}(\mathbf{x})}\right] \\
+&=-\log2+\int_{\mathbf{x}} p_{data}(\mathbf{x}) \log \left(\frac{p_{data}\left(\mathbf{x}\right)}{\left(p_{data}\left(\mathbf{x}\right)+p_G\left(\mathbf{x}\right)\right)/2}\right) d \mathbf{x} -\log2+\int_{\mathbf{x}}p_{G}(\mathbf{x}) \log \left(\frac{p_{G}\left(\mathbf{x}\right)}{\left(p_{data}\left(\mathbf{x}\right)+p_G\left(\mathbf{x}\right)\right)/2}\right) d \mathbf{x} \\
+&=-2\log2+KL\left(p_{data}\Big|\Big|\frac{p_{darta}+p_G}{2}\right)+KL\left(p_G\Big|\Big|\frac{p_{darta}+p_G}{2}\right) \\
+&=-2\log2+2\cdot JSD\left(p_{data}\|p_G\right)
+\end{aligned}</script><p>优化问题：</p>
+<script type="math/tex; mode=display">
+\min_G C\left(G\right)</script><p>由于$p_{data}$和$p_G$两个分布的JS散度是非负的，当且仅当$p_{data}=p_G$时JS散度等于$0$，目标函数$C\left(G\right)$的最小值为$C^{*}=-2\log2$，即生成器完整的复现了数据的生成过程。</p>
+<h3 id="小批量随机梯度下降训练算法"><a href="#小批量随机梯度下降训练算法" class="headerlink" title="小批量随机梯度下降训练算法"></a>小批量随机梯度下降训练算法</h3><p>生成对抗网络的小批量随机梯度下降训练算法：<br>输入：数据分布$p_{data}\left(\mathbf{x}\right)$，输入噪声先验分布$p_\mathbf{z}\left(\mathbf{z}\right)$，训练轮次$n$，判别器训练步数$k$，小批量$m$；<br>输出：判别器$D\left(\mathbf{x};\theta_d\right)$和生成器$G\left(\mathbf{z};\theta_g\right)$  </p>
+<ol>
+<li><p>for 训练轮次$n$ do<br>1.1 for 判别器训练步数$k$ do<br>   1.1.1 从输入噪声分布$p_\mathbf{z}\left(\mathbf{z}\right)$生成$m$个小样本噪声样本$\left\{\mathbf{z}^{\left(1\right)},\cdots,\mathbf{z}^{\left(m\right)}\right\}$<br>   1.1.2 从数据分布$p_{data}\left(\mathbf{z}\right)$生成$m$个小样本数据$\left\{\mathbf{x}^{\left(1\right)},\cdots,\mathbf{x}^{\left(m\right)}\right\}$<br>   1.1.3 通过增加随机梯度更新判别器 </p>
+<script type="math/tex; mode=display">
+\nabla_{\theta_d}\frac{1}{m}\sum_{i=1}^m\left[\log D\left(\mathbf{x}^{\left(i\right)}\right)+\log\left(1-D\left(G\left(\mathbf{z}^{\left(i\right)}\right)\right)\right)\right]</script><p>1.2 end for<br>1.3  从输入噪声分布$p_\mathbf{z}\left(\mathbf{z}\right)$生成$m$个小样本噪声样本$\left\{\mathbf{z}^{\left(1\right)},\cdots,\mathbf{z}^{\left(m\right)}\right\}$<br>1.4 通过降低随机梯度更新生成器 </p>
+<script type="math/tex; mode=display">
+\nabla_{\theta_g}\frac{1}{m}\sum_{i=1}^m\log\left(1-D\left(G\left(\mathbf{z}^{\left(i\right)}\right)\right)\right)</script></li>
+<li><p>end for</p>
+</li>
+</ol>
+<h2 id="2-深度卷积生成对抗网络"><a href="#2-深度卷积生成对抗网络" class="headerlink" title="2 深度卷积生成对抗网络"></a>2 深度卷积生成对抗网络</h2><h3 id="模型架构特点"><a href="#模型架构特点" class="headerlink" title="模型架构特点"></a>模型架构特点</h3><ol>
+<li>判别器中使用跨步卷积（strided convolutions）替换池化层；生成器中使用微步卷积（fractional-strided convolutions）替换池化层；</li>
+<li>判别器和生成器都使用批归一化；</li>
+<li>判别器和生成器都移除全连接隐层；</li>
+<li>生成器中的所有层都使用ReLU激活函数，但输出层除外，后者使用Tanh激活函数；</li>
+<li>判别器中的所有层都使用LeakyReLU激活函数。</li>
+</ol>
+<p><img src="https://i.loli.net/2020/05/05/E3NARGH1nmebVwQ.png" srcset="/img/loading.gif" style="zoom:120%;" /></p>
+<h2 id="3-生成对抗网络的改进及发展"><a href="#3-生成对抗网络的改进及发展" class="headerlink" title="3. 生成对抗网络的改进及发展"></a>3. 生成对抗网络的改进及发展</h2><h3 id="对数据分布-p-data-和生成分布-p-G-加入噪声"><a href="#对数据分布-p-data-和生成分布-p-G-加入噪声" class="headerlink" title="对数据分布$p_{data}$和生成分布$p_G$加入噪声"></a>对数据分布$p_{data}$和生成分布$p_G$加入噪声</h3><p>当数据分布$p_{datea}$与生成分布$p_G$的支撑集是高维空间中的低维流形时，$p_{data}$与$p_G$重叠部分测度为$0$的概率为$1$，即分布$p_{data}$与分布$p_G$没有重叠或重叠非常少。而当分布$p_{data}$与分布$p_G$没有重叠或重叠非常少时，JS散度为常量，很难衡量两个分布的距离。使得生成器$G\left(\mathbf{z}\right)$的梯度为$0$，造成梯度消失。</p>
+<p>目标函数：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+C(G) &=\mathbb{E}_{\mathbf{x} \sim p_{data+\epsilon}}\left[\log D_{G}^{*}(\mathbf{x})\right]+\mathbb{E}_{\mathbf{x} \sim p_{G+\epsilon}}\left[\log \left(1-D_{G}^{*}(\mathbf{x})\right)\right] \\
+&=-2\log2+2\cdot JSD\left(p_{data+\epsilon}\|p_{G+\epsilon}\right)
+\end{aligned}</script><p>其中，$p_{data+\epsilon}$为加入噪声后的数据分布，$p_{G+\epsilon}$为加入噪声后的生成分布。</p>
+<h3 id="使用Wasserstein距离进行分布度量"><a href="#使用Wasserstein距离进行分布度量" class="headerlink" title="使用Wasserstein距离进行分布度量"></a>使用Wasserstein距离进行分布度量</h3><p>Wasserstein距离（Earth-Mover距离）：</p>
+<script type="math/tex; mode=display">
+\begin{align}
+W\left(p_{data},p_G\right)&=\inf_{\gamma\left(\mathbf{x},\mathbf{y}\right)\in\Gamma\left(p_{data},p_G\right)}\mathbb{E}_{\left(\mathbf{x},\mathbf{y}\right)\sim\gamma\left(\mathbf{x},\mathbf{y}\right)}\left[d\left(\mathbf{x},\mathbf{y}\right)\right] \\
+&=\inf_{\gamma\left(\mathbf{x},\mathbf{y}\right)\in\Gamma\left(p_{data},p_G\right)}\sum_{\left(\mathbf{x},\mathbf{y}\right)}\gamma\left(\mathbf{x},\mathbf{y}\right)d\left(\mathbf{x},\mathbf{y}\right)
+\end{align}</script><p>其中，$\Gamma\left(p_{data},p_G\right)$为分布$p_{data}$与$p_G$的所有可能的联合分布集合，$d\left(\mathbf{x},\mathbf{y}\right)$为$\mathbf{x}$和$\mathbf{y}$之间的欧氏距离。</p>
+<p><img src="https://i.loli.net/2020/05/05/rEVLYf8QUHNxIO9.png" srcset="/img/loading.gif" alt="wd" style="zoom:150%;" /></p>
+<p>由于Wasserstein距离可表示为</p>
+<script type="math/tex; mode=display">
+W\left(p_{data},p_G\right)=\frac{1}{K}\sup_{\|f\|_L\leq K}\mathbb{E}_{\mathbf{x}\sim p_{data}}\left[f\left(\mathbf{x}\right)\right]-\mathbb{E}_{\mathbf{x}\sim p_G}\left[f\left(\mathbf{x}\right)\right]</script><p>其中，$|f|_L$为函数$f$的Lipschitz常数。</p>
+<p>所以可得</p>
+<script type="math/tex; mode=display">
+K\cdot W\left(p_{data},p_G\right)\approx\max_{w;\|f_w\|_L\leq K}\mathbb{E}_{\mathbf{x}\sim p_{data}}\left[f_w\left(\mathbf{x}\right)\right]-\mathbb{E}_{\mathbf{x}\sim p_G}\left[f_w\left(\mathbf{x}\right)\right]</script><p>其中，$f_w$为由参数$w$表示的函数。</p>
+<p>WGAN生成器损失：</p>
+<script type="math/tex; mode=display">
+-\mathbb{E}_{\mathbf{x}\sim p_G}\left[f_w\left(\mathbf{x}\right)\right]</script><p>WGAN判别器损失：</p>
+<script type="math/tex; mode=display">
+\mathbb{E}_{\mathbf{x}\sim p_{data}}\left[f_w\left(\mathbf{x}\right)\right]-\mathbb{E}_{\mathbf{x}\sim p_G}\left[f_w\left(\mathbf{x}\right)\right]</script><h2 id="4参考资料："><a href="#4参考资料：" class="headerlink" title="4参考资料："></a>4参考资料：</h2><p>《Generative Adversarial Nets》</p>
+<p>《UNSUPERVISED REPRESENTATION LEARNING WITH DEEP CONVOLUTIONAL GENERATIVE ADVERSARIAL NETWORKS》</p>
+<p>《Wasserstein GAN》 </p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Deep-Learning/">Deep Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/GAN/">GAN</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/Transfer-Learning/">
+                        <span class="hidden-mobile">Transfer_Learning</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Generative_Adversarial_Networks&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="anch3or">
+  <meta name="keywords" content="">
+  <title>MCMC - anch3or&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 30vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>anch3or's blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+
+              <p class="mt-1">
+                
+
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h1 id="马尔科夫链蒙特卡罗法（Markov-Chain-Monte-Carlo，MCMC）"><a href="#马尔科夫链蒙特卡罗法（Markov-Chain-Monte-Carlo，MCMC）" class="headerlink" title="马尔科夫链蒙特卡罗法（Markov Chain Monte Carlo，MCMC）"></a>马尔科夫链蒙特卡罗法（Markov Chain Monte Carlo，MCMC）</h1><script type="math/tex; mode=display">
+\begin{align}
+\end{align}</script><h2 id="1-蒙特卡洛法"><a href="#1-蒙特卡洛法" class="headerlink" title="1 蒙特卡洛法"></a>1 蒙特卡洛法</h2><p>蒙特卡洛法要解决的问题是，假设概率分布的定义已知，通过抽样获得概率分布的随机样本，并通过得到的随机样本对概率分布的特征进行分析。</p>
+<p>蒙特卡洛的法有直接抽样法、接受-拒绝抽样法、重要性抽样法等，其核心是随机抽样。</p>
+<p>接受-拒绝算法：<br>输入：抽样的目标概率分布的概率密度函数$p\left(x\right)$；<br>输出：概率分布的随机样本$x_1,x_2,\cdots,x_n$。  </p>
+<ol>
+<li>选择概率密度函数为$q\left(x\right)$的概率分布作为建议分布，使其对任一$x$满足$cq\left(x\right)\geq \left(x\right)$，其中$c&gt;0$。</li>
+<li>按照建议分布$q\left(x\right)$随机抽样得到样本$x’$，再按照均匀分布在$\left(0,1\right)$范围内抽样得到$u$。</li>
+<li>如果$u\leq\frac{p\left(x’\right)}{cq\left(x’\right)}$，则将$x’$作为抽样结果；否则，回到步骤2.。</li>
+<li>直至得到$n$个随机样本，结束。</li>
+</ol>
+<h2 id="2-马尔科夫链"><a href="#2-马尔科夫链" class="headerlink" title="2 马尔科夫链"></a>2 马尔科夫链</h2><p>假设在时刻$0$的随机变量$X_0$遵循概率分布$P\left(X_0\right)=\pi_0$，称为初始状态分布。在某个时刻$t\geq 1$的随机变量$X_t$与前一个时刻的随机变量$X_{t-1}$之间有条件分布$P\left(X_t|X_{t-1}\right)$，如果$X_t$只依赖于$X_{t-1}$，这一性质称为马尔科夫性，即</p>
+<script type="math/tex; mode=display">P\left(X_t|X_0,X_1,\cdots,X_{t-1}\right)=P\left(X_t|X_{t-1}\right), t=1,2,\cdots</script><p>具有马尔科夫性的随机序列$X=\{X_0,X_1,\cdots,X_t,\cdots\}$称为马尔科夫链或马尔科夫过程。每个随机变量$X_t\left(t=0,1,2,\cdots\right)$的取值集合相同，称为状态空间$\mathcal{S}$。</p>
+<p>离散状态马尔科夫链$X=\{X_0,X_1,\cdots,X_t,\cdots\}$，随机变量$X_t\left(t=0,1,2,\cdots\right)$定义在离散空间$\mathcal{S}$，转移概率分布可以由矩阵表示。</p>
+<p>若马尔科夫链咋时刻$t-1$处于状态$j$，在时刻$t$移动到状态$i$，将转移概率记作</p>
+<script type="math/tex; mode=display">p_{ij}=\left(X_t=i|X_{t-1}=j\right),i=1,2,\cdots;j=1,2,\cdots</script><p>满足</p>
+<script type="math/tex; mode=display">p_{ij}\geq 0, \sum_i p_{ij}=1</script><p>马尔科夫链的转移矩阵可表示为</p>
+<script type="math/tex; mode=display">P=\left[p_{ij}\right]</script><p>马尔科夫链$X=\{X_0,X_1,\cdots,X_t,\cdots\}$在时刻$t,t=0,1,2,\cdots$的概率分布，称为时刻$t$的状态分布，记作</p>
+<script type="math/tex; mode=display">\pi\left(t\right)=\left[\begin{matrix}
+   \pi_1\left(t\right) \\
+   \pi_2\left(t\right) \\
+   \vdots \\
+  \end{matrix}\right]</script><p>其中$\pi_i\left(t\right)$表示时刻$t$状态为$i$的概率$P\left(X_t=i\right)$</p>
+<script type="math/tex; mode=display">\pi_i\left(t\right)=P\left(X_t=i\right),i=1,2,\cdots</script><p>特别地，马尔科夫链的初始状态分布可表示为</p>
+<script type="math/tex; mode=display">\pi\left(0\right)=\left[\begin{matrix}
+   \pi_1\left(0\right) \\
+   \pi_2\left(0\right) \\
+   \vdots \\
+  \end{matrix}\right]</script><p>其中$\pi_i\left(0\right)$表示时刻$0$状态为$i$的概率$P\left(X_t=i\right)$</p>
+<script type="math/tex; mode=display">\pi_i\left(0\right)=P\left(X_t=i\right)</script><p>通常初始分布$\pi\left(0\right)$的向量只有一个分量是$1$，其余分量是$0$，表示马尔科夫链从一个具体状态开始。</p>
+<p>马尔科夫链$X$在时刻$t$的状态分布，可以由在时刻$t-1$的状态分布以及转移概率分布决定</p>
+<script type="math/tex; mode=display">\pi\left(t\right)=P\pi\left(t-1\right)</script><p>设有马尔科夫链$X=\{X_0,X_1,\cdots,X_t,\cdots\}$，其状态空间为$\mathcal{S}$，转移概率矩阵为$P=\left[p_{ij}\right]$，如果状态空间$\mathcal{S}$上的一个分布</p>
+<script type="math/tex; mode=display">\pi=\left[\begin{matrix}
+   \pi_1 \\
+   \pi_2 \\
+   \vdots \\
+  \end{matrix}\right]</script><p>使得</p>
+<script type="math/tex; mode=display">\pi=P\pi</script><p>则称$\pi$为马尔科夫链$X=\{X_0,X_1,\cdots,X_t,\cdots\}$的平稳分布。</p>
+<p>连续状态马尔科夫链$X=\{X_0,X_1,\cdots,X_t,\cdots\}$，随机变量$X_t\left(t=0,1,2,\cdots\right)$定义在连续状态空间$\mathcal{S}$，转移状态分布由概率转移核或转移核表示。</p>
+<p>设$\mathcal{S}$是连续状态空间，对任意的$x\in\mathcal{S},A\subset\mathcal{S}$，转移核定义为</p>
+<script type="math/tex; mode=display">P\left(x,A\right)=\int_A p\left(x,y\right)\mathrm{d}y</script><p>其中，$p\left(x,\centerdot\right)$是概率密度函数，满足$p\left(x,\centerdot\right)\geq0,P\left(x,\mathcal{S}\right)=\int_{\mathcal{S}}p\left(x,y\right)\mathrm{d}y=1$。转移核$P\left(x,A\right)$表示从$x\thicksim A$的转移概率</p>
+<script type="math/tex; mode=display">P\left(X_t=A|X_{t-1}=x\right)=P\left(x,A\right)</script><p>有时也将概率密度函数$p\left(x,\centerdot\right)$称为转移核。</p>
+<p>若马尔科夫链的转态空间$\mathcal{S}$上的概率分布$\pi\left(x\right)$满足条件</p>
+<script type="math/tex; mode=display">\pi\left(y\right)=\int p\left(x,y\right)\pi\left(x\right)\mathrm{d}x,\quad\forall y\in\mathcal{S}</script><p>则称分布$\pi\left(x\right)$为该马尔科夫链的平稳分布。等价地，</p>
+<script type="math/tex; mode=display">\pi\left(A\right)=\int P\left(x,A\right)\pi\left(x\right)\mathrm{d}x,\quad\forall A\subset\mathcal{S}</script><p>或简写成</p>
+<script type="math/tex; mode=display">\pi=P\pi</script><h2 id="3-马尔科夫链蒙特卡洛法——Metropolis-Hastings算法"><a href="#3-马尔科夫链蒙特卡洛法——Metropolis-Hastings算法" class="headerlink" title="3 马尔科夫链蒙特卡洛法——Metropolis-Hastings算法"></a>3 马尔科夫链蒙特卡洛法——Metropolis-Hastings算法</h2><p>假设要抽样的概率分布为$p\left(x\right)$。MH算法采用转移核为$p\left(x,x^{‘}\right)$的马尔科夫链：</p>
+<script type="math/tex; mode=display">p\left(x,x^{'}\right)=q\left(x,x^{'}\right)\alpha\left(x,x^{'}\right)</script><p>其中，$q\left(x,x^{‘}\right)$为建议分布，$\alpha\left(x,x^{‘}\right)$为接受分布。</p>
+<p>建议分布$q\left(x,x^{‘}\right)$是另一个马尔科夫链的转移核，并且其概率值恒不为$0$，同时是一个容易抽样的分布。</p>
+<p>接受分布$\alpha\left(x,x^{‘}\right)$是</p>
+<script type="math/tex; mode=display">\alpha\left(x,x^{'}\right)=\min\left\{1,\frac{p\left(x^{'}\right)q\left(x^{'},x\right)}{p\left(x\right)q\left(x,x^{'}\right)}\right\}</script><p>转移核可表示为</p>
+<script type="math/tex; mode=display">p\left(x,x^{'}\right)= \left\{ \begin{array}  & q\left(x,x^{'}\right)  & p\left(x^{'}\right)q\left(x^{'},x\right)\geq p\left(x\right)q\left(x,x^{'}\right)\\ 
+q\left(x,x^{'}\right) \frac{p\left(x^{'}\right)}{p\left(x\right)}  & p\left(x^{'}\right)q\left(x^{'},x\right)< p\left(x\right)q\left(x,x^{'}\right) \end{array} \right.</script><p>转移核为$p\left(x,x^{‘}\right)$的马尔科夫链上的随机游走以以下方式进行：如果在时刻$t-1$处于状态$x$，即$X_{t-1}=x$，则先按建议分布$q\left(x,x^{‘}\right)$抽样一个候选状态$x^{‘}$，然后按照接受分布$\alpha\left(x,x^{‘}\right)$抽样决定是否接受状态$x^{‘}$。以概率$\alpha\left(x,x^{‘}\right)$接受$x^{‘}$，$X_t=x^{‘}$；以概率$1-\alpha\left(x,x^{‘}\right)$拒绝$x^{‘}$，$X_t=x$。</p>
+<p>具体地，在区间$\left(0,1\right)$上的均匀分布中抽取一个随机数$u$，决定时刻$t$的状态</p>
+<script type="math/tex; mode=display">X_t= \left\{ \begin{array}  & x^{'}, & u\leq\alpha\left(x,x^{'}\right) \\ 
+x, & u>\alpha\left(x,x^{'}\right) \end{array} \right.</script><p>可以证明，转移核为$p\left(x,x^{‘}\right)$的马尔科夫链的平稳状态就是$p\left(x\right)$，即要抽样的目标分布。</p>
+<p>建议分布的对称形式，即对任意的$x$和$x^{‘}$有</p>
+<script type="math/tex; mode=display">q\left(x,x^{'}\right)=q\left(x^{'},x\right)</script><p>这样的建议分布称为Metropolis选择。此时，接受分布$\alpha\left(x,x^{‘}\right)$简化为</p>
+<script type="math/tex; mode=display">\alpha\left(x,x^{'}\right)=\min\left\{1,\frac{p\left(x^{'}\right)}{p\left(x\right)}\right\}</script><p>建议分布的独立抽样形式，即$q\left(x,x^{‘}\right)$与当前状态$x$无关，<script type="math/tex">q\left(x,x^{'}\right)=q\left(x^{'}\right)</script><br>此时，接受分布$\alpha\left(x,x^{‘}\right)$可写成</p>
+<script type="math/tex; mode=display">\alpha\left(x,x^{'}\right)=\min\left\{1,\frac{w\left(x^{'}\right)}{w\left(x\right)}\right\}</script><p>其中，$w\left(x^{‘}\right)=p\left(x^{‘}\right)/q\left(x^{‘}\right)$，$w\left(x\right)=p\left(x\right)/q\left(x\right)$。</p>
+<p>Metropolis-Hastings算法：<br>输入：待抽样的目标分布的密度函数$p\left(x\right)$，收敛步骤$m$，迭代步骤$n$<br>输出：$p\left(x\right)$的随机样本$x_{m+1},x_{m+2},\cdots,x_n$</p>
+<ol>
+<li>任意选择一个初始状态值$X_0$</li>
+<li>对$i=1,2,\cdots,n$ 循环执行<br>(a)设状态 $X_{i-1}=x$，按照建议分布$q\left(x,x^{‘}\right)$随机抽样一个候选状态$x^{‘}$<br>(b)计算接受概率  <script type="math/tex; mode=display">\alpha\left(x,x^{'}\right)=\min\left\{1,\frac{p\left(x^{'}\right)q\left(x^{'},x\right)}{p\left(x\right)q\left(x,x^{'}\right)}\right\}</script>(c)从区间$\left(0,1\right)$中按均匀分布随机抽取数$u$<br>若$u\leq\alpha\left(x,x^{‘}\right)$，则状态$X_i=x^{‘}$；否则，状态$X_i=x$。</li>
+<li>得到样本集合$\{x_{m+1},x_{m+2},\cdots,x_n\}$</li>
+</ol>
+<h2 id="4-单分量Metropolis-Hastings算法"><a href="#4-单分量Metropolis-Hastings算法" class="headerlink" title="4 单分量Metropolis-Hastings算法"></a>4 单分量Metropolis-Hastings算法</h2><p>假设马尔科夫链的状态由$k$维随机变量表示</p>
+<script type="math/tex; mode=display">x=\left(x_1,x_2,\cdots,x_k\right)^\top</script><p>其中，$x_j$表示随机变量$x$的第$j$个分量，$j=1,2,\cdots,k$</p>
+<p>马尔科夫链在时刻$i$的状态</p>
+<script type="math/tex; mode=display">x^{\left(i\right)}=\left(x_1^{\left(i\right)},x_2^{\left(i\right)},\cdots,x_k^{\left(i\right)}\right)</script><p>其中，$x_j^{\left(i\right)}$是随机变量$x^{\left(i\right)}$的第$j$个分量，$j=1,2,\cdots,k$。</p>
+<p>单分量Metropolis-Hastings算法由下面的$k$步迭代实现Metropolis-Hastings算法的一次迭代。</p>
+<p>设在第$i-1$次迭代结束时分量$x_j$的取值为$x_j^{\left(i-1\right)}$，在第$i$次迭代的第$j$步，对分量$x_j$根据Metropolis-Hastings算法更新，得到其新的取值$x_j^{\left(i\right)}$。</p>
+<p>首先，由建议分布$q\left(x_j^{\left(i-1\right)},x_j|x_{-j}^{\left(i\right)}\right)$抽样产生分量$x_j$的候选值$x_j^{‘\left(i\right)}$。$x_{-j}^{\left(i\right)}$表示在第$i$次迭代的第$j-1$步后的$x^{\left(i\right)}$除去$x_j^{\left(i-1\right)}$的所有值，即</p>
+<script type="math/tex; mode=display">x_{-j}^{\left(i\right)}=\left(x_1^{\left(i\right)},\cdots,x_{j-1}^{\left(i\right)},x_{j+1}^{\left(i-1\right)},\cdots,x_{k}^{\left(i-1\right)}\right)^\top</script><p>其中分量$x_1^{\left(i\right)},\cdots,x_{j-1}^{\left(i\right)}$已经更新。</p>
+<p>然后，按照接受概率</p>
+<script type="math/tex; mode=display">\alpha\left(x_j^{\left(i-1\right)},x_j^{'\left(i\right)}|x_{-j}^{\left(i\right)}\right)=\min\left\{1,\frac{p\left(x_j^{'\left(i\right)}|x_{-j}^{\left(i\right)}\right)q\left(x_j^{'\left(i\right)},x_j^{\left(i-1\right)}|x_{-j}^{\left(i\right)}\right)}{p\left(x_j^{\left(i-1\right)}|x_{-j}^{\left(i\right)}\right)q\left(x_j^{\left(i-1\right)},x_j^{'\left(i\right)}|x_{-j}^{\left(i\right)}\right)}\right\}</script><p>抽样决定是否接受候选值$x_j^{‘\left(i\right)}$。如果接受，则令$x_j^{\left(i\right)}=x_j^{‘\left(i\right)}$；否则，令$x_j^{\left(i\right)}=x_j^{\left(i-1\right)}$。其余分量在第$j$步不改变。</p>
+<p>马尔科夫链的转移概率为</p>
+<script type="math/tex; mode=display">p\left(x_j^{\left(i-1\right)},x_j^{'\left(i\right)}|x_{-j}^{\left(i\right)}\right)=q\left(x_j^{\left(i-1\right)},x_j^{'\left(i\right)}|x_{-j}^{\left(i\right)}\right)\alpha\left(x_j^{\left(i-1\right)},x_j^{'\left(i\right)}|x_{-j}^{\left(i\right)}\right)</script><p>由于建议分布可能不被接受，Metropolis-Hastings算法可能在一些相邻的时刻不产生移动。</p>
+<h2 id="5-吉布斯抽样"><a href="#5-吉布斯抽样" class="headerlink" title="5 吉布斯抽样"></a>5 吉布斯抽样</h2><p>吉布斯抽样用于多元变量联合分布的抽样和评估。</p>
+<p>吉布斯抽样是单分量Metropolis-Hastings算法的特殊情况。定义建议分布是当前变量$x_j\left(j=1,2,\cdots,k\right)$的满概率分布</p>
+<script type="math/tex; mode=display">q\left(x,x^{'}\right)=p\left(x_j^{'}|x_{-j}\right)</script><p>则接受概率</p>
+<script type="math/tex; mode=display">\begin{align}
+\alpha\left(x,x^{'}\right) &= \min\left\{1,\frac{p\left(x^{'}\right)q\left(x^{'},x\right)}{p\left(x\right)q\left(x,x^{'}\right)} \right\} \\
+&=\min\left\{1, \frac{p\left(x_j^{'}|x_{-j}^{'}\right)p\left(x_{-j}^{'}\right)p\left(x_j|x_{-j}^{'}\right)}{p\left(x_j|x_{-j}\right)p\left(x_{-j}\right)p\left(x_j^{'}|x_{-j}\right)}\right\}
+\end{align}</script><p>由于在对第$j$个分量的采样过程中其余分量不变，即$x_{-j}=x_{-j}^{‘}$，所以可得$\alpha\left(x,x^{‘}\right)=1$，即转移概率为$1$。</p>
+<p>由以上，可得吉布斯抽样的转移核</p>
+<script type="math/tex; mode=display">\begin{align}
+p\left(x,x^{'}\right) &= q\left(x,x^{'}\right)\alpha\left(x,x^{'}\right)  \\
+&= p\left(x_j^{'}|x_{-j}\right)
+\end{align}</script><p>即一次按照单变量的满条件概率分布$p\left(x_j^{‘}|x_{-j}\right)$进行随机抽样，就能实现但分量Metropolis-Hastings算法。</p>
+<p>吉布斯抽样对每次抽样的结果都接受，没有拒绝。抽样会在样本点之间持续移动。</p>
+<p>吉布斯抽样算法：<br>输入：目标概率分布的密度函数$p\left(x\right)$，迭代步数$n$，收敛步数$m$；<br>输出：$p\left(x\right)$的随机样本$x_{m+1},x_{m+2},\cdots,x_n$；</p>
+<ol>
+<li>给出初始样本$x^{\left(0\right)}=\left(x_1^{\left(0\right)},x_2^{\left(0\right)},\cdots,x_k^{\left(0\right)}\right)^\top$</li>
+<li>对$i\left(i=1,2,\cdots,n\right)$循环执行<br>设第$i-1$轮迭代结束时的样本为$x^{\left(i-1\right)}=\left(x_1^{\left(i-1\right)},x_2^{\left(i-1\right)},\cdots,x_k^{\left(i-1\right)}\right)^\top$<br>在第$i$轮迭代中，对$j\left(j=1,2,\cdots,k\right)$循环执行<br>$\quad$由满条件分布$p\left(x_j|x_1^{\left(i-1\right)},\cdots,x_{j-1}^{\left(i-1\right)},x_{j+1}^{\left(i-1\right)}\cdots,x_k^{\left(i-1\right)}\right)$抽取$x_j^{\left(i\right)}$<br>得到第$i$轮迭代值$x^{\left(i\right)}=\left(x_1^{\left(i\right)},x_2^{\left(i\right)},\cdots,x_k^{\left(i\right)}\right)^\top$</li>
+<li>得到样本集合<br>$\left\{x^{\left(m+1\right)},x^{\left(m+2\right)},\cdots,x^{\left(n\right)}\right\}$</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Machine-Learning/">Machine Learning</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/topic-model/">topic model</a>
+                    
+                      <a class="hover-with-bg" href="/tags/markov-chain/">markov chain</a>
+                    
+                      <a class="hover-with-bg" href="/tags/monte-carlo/">monte carlo</a>
+                    
+                      <a class="hover-with-bg" href="/tags/metropolis-hastings/">metropolis hastings</a>
+                    
+                      <a class="hover-with-bg" href="/tags/gibbs-sampling/">gibbs sampling</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/05/05/LDA/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">LDA</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/05/05/pLSA/">
+                        <span class="hidden-mobile">pLSA</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  
+<script src="/js/custom.js"></script>
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "MCMC&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+          tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+              processEscapes: true,
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+          }
+      });
+      MathJax.Hub.Register.StartupHook("End Jax",function () {
+        var BROWSER = MathJax.Hub.Browser;
+        var jax = "HTML-CSS";
+        if (BROWSER.isMSIE && BROWSER.hasMathPlayer) jax = "NativeMML";
+        return MathJax.Hub.setRenderer(jax);
+      });
+      MathJax.Hub.Queue(function() {
+          var all = MathJax.Hub.getAllJax(), i;
+          for(i=0; i < all.length; i += 1) {
+              all[i].SourceElement().parentNode.className += ' has-jax';
+          }
+      });
+
+    </script>
+
+    <script  src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
